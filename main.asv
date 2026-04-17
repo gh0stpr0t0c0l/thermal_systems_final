@@ -10,17 +10,18 @@ L_DUCT = 0.15;                       %Duct len, meters
 w = L_DUCT;                          %fin width, meters
 T_DUCT = 0.01;                       %Duct thickness, meters
 s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
-D_h = (2*L*s)/(L+s);                 %Hydraulic diameter of surragate duct, meters
+D_h = (2*L*s)/(L+s);                 %Hydraulic diameter, meters
 A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
 
 %% Calculate Mass Flow Rate
 
-%% Calculate Air Density (Assume temperature, pressure??)
+%% Calculate Air Density (Assume temperature??)
 
 %% Calculate Mean Velocity
 
-%% Calculate Surrogate Duct Reynolds Number
-Re_D = (U_m * D_n) / nu;
+%%
+
+
 
 %% Calculate Convection Heat Transfer Coefficient
 
