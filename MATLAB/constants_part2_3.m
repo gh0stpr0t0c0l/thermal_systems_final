@@ -8,3 +8,4 @@ c_p = 1007;                          %Specific heat of air between 15 and 70 deg
 k = 383                             %thermal conductivity, CHOSEN MATERIAL @T_bulk??
 A_c_wall = L_DUCT * L_SIDE;          %Cross sectional area of duct side for conduction, m^2 IGNORES CORNER AREA
 A_c_CPUs = 0.0014 * 9;               %total cross sectional area of CPUs for contact resistance, m^2
+h_c = 6 %thermal paste thermal contact coefficient, W/(m*K) PICK AN ACTUAL PASTE

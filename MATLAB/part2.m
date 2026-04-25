@@ -5,18 +5,22 @@ constants_part2_3
 %P_CPU =                             %CPU Power, W, VARIABLE
 %P_fan =                             %Fan Power, W, VARIABLE
 
+%% Calculate Thermal Resistances
+R_paste = 1/(h_c * A_c_CPUs)
+R_cond = t_DUCT/(k * A_c_wall)
+
+%% Calculate Air Density (Assume temperature, pressure??)
+T_bulk = (T_me + T_mi)/2 - 273.15 %celcius
+rho = 1.145; %assumed based on a temperature of T_bulk, FROM TABLE
+nu = 1.655 * 10e-5; %assumed based on a temperature of T_bulk, FROM TABLE
+Pr = 0.7268; %Prandtl number, assumed based on a temperature of T_bulk, FROM TABLE
+
 %% Iteratively solve for Q_dot_tot
 sim('simulink_recursive_solve');
 
 %% Calculate mass flow rate
 %given T_me = T_mi + Q_dot/(m_dot * c_p)
 m_dot_air = simOut.Q_dot_tot/(c_p*(T_me-T_mi)) %this is the necessary m_dot
-
-%% Calculate Air Density (Assume temperature, pressure??)
-T_bulk = (T_me + T_mi)/2 - 273.15 %celcius
-rho = 1.145; %assumed based on a temperature of T_bulk FROM TABLE
-nu = 1.655 * 10E-5; %assumed based on a temperature of T_bulk FROM TABLE
-Pr = 0.7268; %Prandtl number, assumed based on a temperature of T_bulk FROM TABLE
 
 %% Calculate Mean Velocity
 %assume conservation of mass to use:
@@ -27,8 +31,8 @@ Re_D = (u_m * D_h) / nu; %Reynolds number for the duct
 
 %% Calculate Convection Heat Transfer Coefficient
 %assume turbulent
-Nu = 0.023*Re^0.8*Pr^0.4;
-h = Nu*k/(D_h)                       %convection heat transfer coefficient, PART 2
+Nu = 0.023*Re_D^0.8*Pr^0.4;
+h = Nu*k/(D_h)                       %convection heat transfer coefficient, W/(m*K) CHECK UNITS
 
 %% Calculate Fin Efficiency
 m = sqrt((2 * h) / (k * t));         %constant for calculating efficiency
@@ -50,9 +54,7 @@ R_fins = 1 / (h * A_fins * eta_fin); %fins convection thermal resistance, K/W
 R_unfin = 1 / (h * A_unfin);         %unfin convection thermal resistance, K/W
 R_tot = 1/(1/R_fins+1/R_unfin);      %total resistance - parallel resistors, K/W
 
-%% Find Surface Temperatures and Resistances
-R_paste = 1/(h_c * A_c_CPUs)
-R_cond = t_DUCT/(k * A_c_wall)
+%% Find Surface Temperatures
 %from resistor eqn:
 T_b = Q_dot_tot*(R_paste+R_cond) + 90; %celcius
 T_inf = T_bulk; %celcius IS THIS A GOOD ASSUMPTION???
