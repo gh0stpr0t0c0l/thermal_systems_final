@@ -1,0 +1,10 @@
+t_DUCT = 0.01;                       %Duct thickness, meters
+s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
+A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
+D_h = (2*L*s)/(L+s);                 %Hydraulic diameter of surragate duct, meters
+T_mi = 20 + 273.15;                  %mean inlet temperature, K
+T_me = 50 + 273.15;                  %maximum mean duct exit temperature, K
+c_p = 1007;                          %Specific heat of air between 15 and 70 deg C, J/(kg*K) FROM TABLE
+k = 383                             %thermal conductivity, CHOSEN MATERIAL @T_bulk??
+A_c_wall = L_DUCT * L_SIDE;          %Cross sectional area of duct side for conduction, m^2 IGNORES CORNER AREA
+A_c_CPUs = 0.0014 * 9;               %total cross sectional area of CPUs for contact resistance, m^2

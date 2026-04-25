@@ -1,27 +1,18 @@
-%% Define Constants
-P_CPU =                             %CPU Power, W, VARIABLE
-P_fan =                             %Fan Power, W, VARIABLE
-N = 24*4;                            %total number of fins
-t = 0.002;                           %fin thickness, meters
-L = 0.025;                           %fin length, meters
-k = 178                             %thermal conductivity, CHOSEN MATERIAL
-L_SIDE = 0.15;                       %Duct side len, meters
-L_DUCT = 0.15;                       %Duct len, meters
-w = L_DUCT;                          %fin width, meters
-T_DUCT = 0.01;                       %Duct thickness, meters
-s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
-D_h = (2*L*s)/(L+s);                 %Hydraulic diameter, meters
-A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
+%% Load and Define Constants
+constants
+%P_CPU =                             %CPU Power, W, VARIABLE
+%P_fan =                             %Fan Power, W, VARIABLE
 
 %% Calculate Mass Flow Rate
 
-%% Calculate Air Density (Assume temperature??)
+
+%% Calculate Air Density (Assume temperature, pressure??)
+
 
 %% Calculate Mean Velocity
 
-%%
-
-
+%% Calculate Surrogate Duct Reynolds Number
+Re_D = (U_m * D_h) / nu;
 
 %% Calculate Convection Heat Transfer Coefficient
 
@@ -45,7 +36,11 @@ A_tot = A_fins + A_unfin;            %total area of fin bank, meters^2
 %R_tot = 1 / (h * A_tot * eta_tot) 
 R_fins = 1 / (h * A_fins * eta_fin); %fins convection thermal resistance, K/W
 R_unfin = 1 / (h * A_unfin);         %unfin convection thermal resistance, K/W
-%R_fin_tot = 1/(1/R_fins+1/R_unfin)
+R_tot = 1/(1/R_fins+1/R_unfin);      %total resistance - parallel resistors, K/W
+
+%% a) Determine Maximum allowable power dissipation per transistor
+Q_dot_tot = (T_b-T_inf)/R_tot;       %heat transfer rate, W
+Q_dot_tran = Q_dot_tot/N_CPU         %allowed power per transistor
 
 %% Simulate
 
