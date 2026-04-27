@@ -1,14 +1,14 @@
-function [h, Re_D] = findh2(P_CPU, h_c, t_DUCT, A_c, D_h, T_mi, T_me, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w) %convection heat transfer coefficient, W/(m^2*K) CHECK UNITS
-    x = 0.1:0.1:1000;
-    y = zeros(1,length(x));
-    n = 1;
-    for h = x
-        [new, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, T_me, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w);
-        if new < 0
-            plot(x,y)
-            return;
+function [h, Re_D] = findh2(P_CPU, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr) %convection heat transfer coefficient, W/(m^2*K) CHECK UNITS
+    it = 1;
+    precision = 0.00001;
+    h = 1;
+    while it >= precision
+        [new, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+        while new >= 0
+            [new, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+            h = h + it;
         end
-        y(n) = new;
-        n = n+1;
+        h = h - 2 * it;
+        it = it/10;
     end
 end

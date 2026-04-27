@@ -1,10 +1,5 @@
-function [diff, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, T_me, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w)
+function [diff, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
     Q_dot_tot = P_CPU;
-    
-    %% Calculate Air Density (Assume temperature, pressure??)
-    rho = 1.145;                         %kg/m^3, based on a temperature of T_bulk, FROM TABLE
-    nu = 1.655e-5;                       %m^2/s assumed based on a temperature of T_bulk, FROM TABLE
-    Pr = 0.7268;                         %Prandtl number, assumed based on a temperature of T_bulk, FROM TABLE
     
     %% Calculate Reynolds Number
     %Nusselt Number Eqn:

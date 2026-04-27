@@ -10,3 +10,6 @@ k_air = 0.02625                      %W/(m*K), based on a temperature of T_bulk,
 A_c_walls = L_DUCT * L_SIDE * 4;          %Cross sectional area of duct side for conduction, m^2 IGNORES CORNER AREA
 A_c_CPUs = 0.0014 * N_CPU;               %total cross sectional area of CPUs for contact resistance, m^2
 h_c = 30000 %thermal paste thermal contact coefficient, W/(m^2*K) PICK AN ACTUAL PASTE
+rho = 1.145;                         %kg/m^3, based on a temperature of T_bulk, FROM TABLE
+nu = 1.655e-5;                       %m^2/s assumed based on a temperature of T_bulk, FROM TABLE
+Pr = 0.7268;                         %Prandtl number, assumed based on a temperature of T_bulk, FROM TABLE
