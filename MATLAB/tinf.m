@@ -1,4 +1,4 @@
-function diff = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, T_me, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w)
+function [diff, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, T_me, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w)
     Q_dot_tot = P_CPU;
     
     %% Calculate Air Density (Assume temperature, pressure??)
