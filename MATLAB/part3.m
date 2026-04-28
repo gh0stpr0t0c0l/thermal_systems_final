@@ -15,6 +15,9 @@ y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, 
 n = n + 1;
 end
 plot(x,y)
+title('Performance vs Fin Length')
+xlabel('Fin Length L (m)')
+ylabel('PassMark Benchmark Score (All CPUs)')
 
 
 clear
@@ -34,6 +37,9 @@ y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, 
 n = n + 1;
 end
 plot(x,y)
+title('Performance vs Fin Count')
+xlabel('Fin Count N')
+ylabel('PassMark Benchmark Score (All CPUs)')
 
 
 clear
@@ -53,6 +59,9 @@ for t = x
     n = n + 1;
 end
 plot(x,y)
+title('Performance vs Fin Thickness')
+xlabel('Fin Thickness t (m)')
+ylabel('PassMark Benchmark Score (All CPUs)')
 
 clear
 figure
@@ -71,8 +80,12 @@ for k_duct = x
     n = n + 1;
 end
 plot(x,y)
+title('Performance vs Fin Material (Conductivity)')
+xlabel('Fin Thermal Conductivity (W/(m*K))')
+ylabel('PassMark Benchmark Score (All CPUs)')
 
 clear
+figure
 %% Load and Define Constants
 constants
 constants_part3
@@ -86,3 +99,7 @@ for i = 1:size(CPU_perf, 1)
     end
 end
 surf(N, P_CPU, performance)
+title(['Performance over P_{CPU} and N'])
+xlabel('Fin Count N')
+ylabel('Single CPU Power P_{CPU} (W)')
+zlabel('PassMark Benchmark Score (All CPUs)')
