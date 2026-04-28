@@ -45,7 +45,7 @@ function [diff, Re_D, T_me] = tinf(P_CPUs, h, h_c, t_DUCT, ...
     R_unfin = 1 / (h * A_unfin); %unfin convection thermal resistance, K/W
     %total resistance - parallel fin and unfin resistors, K/W
     R_tot = 1/(1/R_fins+1/R_unfin);
-    
+
     T_inf_fin = 90 - Q_dot_tot * (R_paste + R_cond + R_tot);
     
     diff = T_inf_air - T_inf_fin;

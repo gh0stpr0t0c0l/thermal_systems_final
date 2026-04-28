@@ -1,7 +1,7 @@
 t_DUCT = 0.01;                       %Duct thickness, meters
 s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
 A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
-D_h = (2*L*s)/(L+s); %Hydraulic diameter of surragate duct, meters
+D_h = (2*L*s)/(L+s) %Hydraulic diameter of surragate duct, meters
 T_mi = 20;                  %mean inlet temperature, degC
 %T_me = 30;                  %maximum mean duct exit temperature, degC
 %Specific heat of air between 15 and 70 deg C, J/(kg*K) FROM TABLE
