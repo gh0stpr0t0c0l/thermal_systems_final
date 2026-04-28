@@ -147,11 +147,11 @@ Our simplifying assumptions can be seen below:
 \begin{enumerate}
 \item Assume all heat from CPUs is dissipated through the fin bank (no heat loss to the external environment). This greatly reduced the amount of work and considerations needed for later calculations. 
 
-\item Assume 1-D heat transfer for the conduction and convection sections (perpendicular to the duct wall and perpendicular. This is a typical assumption for fin bank analysis. 
+\item Assume 1-D heat transfer for the conduction and convection sections (perpendicular to the duct wall and perpendicular to the fins). This is a typical assumption for fin bank analysis. 
 
 \item Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
 
-\item Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces prevents odd behavior between touching fins and keeps the surrogate ducts identical.
+\item Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This prevents odd behavior between touching fins and keeps the surrogate ducts identical.
 
 \item Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply scale by the number of fins.
 
@@ -594,7 +594,10 @@ As can be seen from the graph of performance versus fin length L, there is a rap
 The above surface plot illustrates the relationship between system performance, CPU power, and fin count. Increasing the number of fins generally improves performance due to the added heat transfer area, while increasing CPU power initially increases performance due to higher computational output. However, at higher power levels, the required cooling becomes more demanding, and the fan power increases rapidly due to its nonlinear dependence on airflow. As a result, performance gains begin to diminish, especially at high CPU power and high fin counts, where the cooling system becomes the limiting factor. This demonstrates that while both increasing fin count and CPU power can improve performance, their combined effects are constrained by the efficiency and power requirements of the cooling system. 
 
 \subsection{Evaluation of Assumptions From Part 1 and 2 Based on Results}
-%%FIXME there needs to be something here about the Reynolds number
+
+Looking back at our assumptions, most were either correct or incredibly useful in simplifying our calculations. For example, the typical fin bank assumptions (1-D heat transfer, thin fins, steady state, etc.) reduced a great deal of work in this project. Additionally, assumptions such as perfectly caloric air, conservation of mass, and negligible changes in kinetic and potential energy allowed us to perform calculations that would otherwise be either very difficult or unsolvable.
+
+However, not all of our assumptions were correct. Specifically, we assumed that the airflow would be turbulent, as this would be expected from this type of duct and fin bank. During our Part 1 calculations, however, we found that the Reynold's number for our design was 1,878.5. While this isn't too far off from the requirement for turbulent airflow (roughly 2,300), it is still low enough to be classified as laminar flow, which is not what we expected. That said, it is entirely possible that the fan will introduce enough force to make the flow turbulent. 
 
 \section{Conclusions}
 
