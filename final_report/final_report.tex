@@ -5,7 +5,7 @@
 \usepackage{amsmath}
 \usepackage{diagbox}
 
-%\usepackage{hyperref}
+\usepackage{hyperref}
 
 \title{\Huge Final Project Report \\ \normalsize{EGME-3170 - Thermal Systems}}
 \author{by \\ Benjamin Paxson \\ Daniel Bourguignon \\ Simon Ross}
@@ -26,11 +26,10 @@
 %FIXME remove comments
 
 %FIXME improve abstract
-\begin{abstract}
-Abstract here - we need contributions from each member somewhere
-
-
-\end{abstract}
+\section*{Teammate Contributions}
+\subsection*{Benjamin Paxson}
+\subsection*{Daniel Bourguignon}
+\subsection*{Simon Ross}
 
 \newpage
 \tableofcontents
@@ -45,11 +44,13 @@ In this Thermal Systems project, we set out to design a fin bank for a given duc
 \subsection{Part 1 - Fin Bank}
 \subsubsection{Introduction to Part 1}
 
-The first part of this project focused on developing the model used to describe the fin bank. While there were many ways to model the system (iterative solver software, Python, etc.) we chose to use MATLAB because of it's familiarity and ease of use with GitHub for sharing among teammates. This part was the most straightforward of the project, simply consisting of calculating various parameters required for describing the fin bank. This included fin efficiencies, fin bank areas, and different resistances. After creating our model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in Figures XXX-XXX in the appendix.
+The first part of this project focused on developing the model used to describe convective heat transfer within the fin bank. While there were many ways to model the system (dedicated iterative solver software, Python, etc.) we chose to use MATLAB because of its familiarity and ease setup among teammates with the required software. 
+
+Part 1 was the most straightforward of the project, simply consisting of calculating various parameters required for describing the fin bank. This included fin efficiencies, fin bank areas, and thermal resistances. After creating this model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in Figures XXX-XXX in the appendix. %%FIXME
 
 \subsubsection{Governing Equations and Modeling Methodology}
 
-The fin bank is modeled using one-dimensional, steady-state heat transfer combined with the thermal resistance analogy method. This approach follows the same methodology used in Example 2.11 from the course notes, where heat transfer is treated analogously to electrical current flow through resistances.
+The given fin bank is modeled using one-dimensional, steady-state heat transfer combined with the thermal resistance method. This approach follows the same methodology used in Example 2.11 from the course notes, where heat transfer is modeled analogous to electrical current flow through resistors.
 
 Under these assumptions, the total heat transfer rate is expressed as
 
@@ -71,6 +72,132 @@ The modeling procedure follows a structured five-step process:
     \item Solve for heat transfer rate and system performance
 \end{enumerate}
 
+\subsection{Part 2 - Cooling System}
+\subsubsection{Introduction to Part 2}
+
+The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. This diagram can be found in Figure XXX in the appendix. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
+
+\subsubsection{Cooling Flow Model and Convective Heat Transfer}
+
+In Part 2, the fin-bank model is extended to include forced convection through the duct. Unlike Part 1, the convection coefficient $h$ is no longer prescribed but instead determined from internal flow correlations. This introduces coupling between the thermal and fluid systems, requiring an iterative solution.
+
+\subsubsection{Surrogate Duct and Flow Assumptions}
+
+The flow between fins is modeled as a series of identical rectangular ducts (also referred to as surrogate ducts), formed by the spacing between adjacent fins. The flow is assumed to be the following:
+\begin{itemize}
+    \item Steady-state
+    \item Fully developed and turbulent
+    \item One-dimensional in the axial direction
+\end{itemize}
+
+Under these assumptions, bulk properties of the flow can be related using conservation laws.
+
+\subsubsection{Coupled Thermal–Fluid Solution}
+
+The fin bank resistance depends on the convection coefficient $h$, while $h$ depends on the Reynolds number, which depends on flow velocity and thus on $\dot{m}_{\text{air}}$. Meanwhile, $\dot{m}_{\text{air}}$ is determined from the energy balance, which depends on the total heat transfer rate.
+
+This creates a nonlinear coupling between:
+\begin{itemize}
+    \item Convection coefficient $h$
+    \item Reynolds number $Re_D$
+    \item Mass flow rate $\dot{m}_{\text{air}}$
+    \item Air temperature $T_{\infty}$
+\end{itemize}
+
+To resolve this, an iterative numerical method is employed. A trial value of $h$ is assumed, and the corresponding flow conditions and temperatures are computed. The resulting air temperature is compared to that predicted by the thermal resistance model, and the value of $h$ is adjusted until convergence is achieved.
+
+\subsubsection{Iterative Solution Procedure}
+
+The convection coefficient $h$ is implicitly coupled to the flow and thermal models through the Reynolds number, Nusselt equation, and energy balance. As a result, $h$ cannot be solved analytically and must be determined numerically.
+
+A root-finding approach is used to enforce consistency between the fluid and thermal models. Specifically, the solution is obtained by satisfying
+
+\begin{equation}
+f(h) = T_{\infty,\text{air}} - T_{\infty,\text{fin}} = 0
+\end{equation}
+
+where $T_{\infty,\text{air}}$ is computed from the energy balance and $T_{\infty,\text{fin}}$ is obtained from the thermal resistance network.
+
+An iterative search is performed by incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reduction of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
+
+At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, ensuring a self-consistent solution for the coupled thermal–fluid system.
+
+\subsection{Part 3 - Performance Analysis}
+\subsubsection{Introduction to Part 3}
+
+The third and final part of this project sought to use the models developed in the first two parts and evaluate their performances as a function of various design parameters for the fin bank (number of fins, fin thickness, fin length, etc.). The problem statement provided a defined fin bank geometry, which we were able to use to analyze the model's performance.  Additionally, the performance was computed used a given benchmark CPU performance score given by the problem statement.
+
+\subsubsection{Performance Analysis and Parametric Study}
+
+In Part 3, the validated thermal–fluid model is used to evaluate system performance as a function of key fin bank design parameters. The objective is to maximize the performance metric defined as the ratio of computational performance to total power consumption.
+
+\subsection{Assumptions}
+
+In order to properly complete this project, we had to make some assumptions along the way. The assumptions we made are as follows:
+\\
+\begin{quote}
+1. Assume all heat from CPUs is dissipated through the fin bank. This greatly reduced the amount of work and considerations needed for later calculations. 
+
+2. Assume 1-D heat transfer through the entire system (perpendicular to the duct wall and perpendicular . This is a typical assumption for fin bank analysis. 
+
+3. Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
+
+4. Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces work by preventing extra conduction between touching fins.
+
+5. Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply multiply by the number of fins.
+
+6. Assume perfectly caloric air. This helps us in our calculations of the volume flow rate of the air.
+
+7. Assume conservation of mass. This allows us to calculate the mean velocity of the air.
+
+8. Assume $T_{bulk} = 30^\circ C$. This allows us to compute many calculations that would be unsolvable otherwise, as well as determine certain values from a properties table. EXPLAIN IN FURTHER DETAIL ELSEWHERE 
+
+9. Assume turbulent airflow. This is to simplify several calculations, and is what we would expect from this type of duct and fin bank.
+\end{quote}
+
+\section{Calculations}
+\subsection{Diagrams} %%FIXME Sparse diagrams out??
+
+To assist in the completion of this project, we made several diagrams throughout. First, we made a diagram of the general fin bank geometry, seen below in Figure 1:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Fin Bank Diagram.jpeg}
+    \caption{Fin Bank Diagram}
+\end{figure}
+
+From this diagram, we can see that the fin geometry is relatively simple. With an inside duct width of 15 cm, each side of the duct contains an equal number of fins, with the fins lined from one wall covering most of the distance to the other end. Each fin is of equal thickness and length, and each extends down the entire length of the duct. It is worth noting that this diagram does not represent the final number of fins per side of the duct, as the number was reduced for the sake of ease in producing the diagram.
+
+Next, we made a diagram showing the thermal resistance through the system. This can be found below in Figure 2:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Thermal Resistance Diagram.jpg}
+    \caption{Thermal Resistance Diagram}
+\end{figure}
+
+Here we can see that the thermal resistance is mostly straightforward. We start on the outside of the duct at one of the CPUs, and go through the resistances of the paste and the duct itself, which are laid in series. Next, we go through the resistances of the actual fin bank and the duct area not covered by fins, which are laid in parallel. Finally, we culminate in $T_\infty$ at the center of the duct within the airflow.
+
+Next, we made a diagram showing the geometry of a single fin. This can be found below in Figure 3:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Fin Diagram.JPG}
+    \caption{Fin Diagram}
+\end{figure}
+
+As per the requirements given in Table 1, each fin has a straight rectangular profile, which greatly simplifies the work of this project.
+
+Finally, we made a diagram showing the surrogate "duct" between each fin, which we used to find the airflow between each fin. This can be found in Figure 4:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Surrogate Duct Diagram.JPG}
+    \caption{Surrogate "Duct" Diagram}
+\end{figure}
+
+Here we can see that the area between two fins is large enough to warrant calculating the airflow between them. Normally, this would be tedious to calculate as an open system. However, because the opening of the "duct" to the main airway is relatively small compared to the length of the fins, we can treat this "duct" as a fully enclosed duct for the sake of ease.
+\subsection{Part 1 - Fin Bank}
 \subsubsection{Fin Geometry and Surface Areas}
 
 The total heat transfer area consists of contributions from both the fins and the unfinned duct surface. These are defined as
@@ -99,7 +226,7 @@ where $N$ is the total number of fins, $w$ is the fin width, and $L_c$ is the co
 
 \subsubsection{Fin Efficiency}
 
-Each fin is modeled as a straight rectangular fin with convection along its surface and at the tip. The fin efficiency is given by
+Each fin is modeled as a straight rectangular fin with convection along its surface and at the tip. The fin efficiency is given by %FIXME there is no convection at the tip
 
 \begin{equation}
 m = \sqrt{\frac{2h}{kt}}
@@ -123,7 +250,7 @@ Because the fin bank consists of both finned and unfinned surfaces, an overall e
 \eta_{\text{tot}} = 1 - \frac{A_{\text{fins}}}{A_{\text{tot}}}(1 - \eta_{\text{fin}})
 \end{equation}
 
-This term accounts for the reduced effectiveness of the finned region relative to an ideal isothermal surface.
+This term accounts for the reduced effectiveness of the finned region relative to an ideal isothermal surface. %%FIXME don't talk about overall efficiency, just how we used efficiency (below)
 
 \subsubsection{Thermal Resistance Network}
 
@@ -176,26 +303,11 @@ Solving for the mass flow rate gives
 This relation assumes constant specific heat and negligible kinetic and potential energy changes.
 
 
+\subsubsection{Verification of Part 1 Model}
+
+Once our model was complete, we verified its functionality by using it to solve Example 2.11(a) from Slide 79 on the Thermal Conduction notes, previously solved in class by Dr. Miller. Our model gave us a maximum allowable power dissipation per CPU of 53.1908 W and an air volume flow rate of 0.1903 kg/s. In class, we calculated a power dissipation of 53.2 W and a flow rate of 0.19 kg/s, thus verifying our model.
 
 \subsection{Part 2 - Cooling System}
-\subsubsection{Introduction to Part 2}
-
-The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. This diagram can be found in Figure XXX in the appendix. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
-
-\subsubsection{Cooling Flow Model and Convective Heat Transfer}
-
-In Part 2, the fin-bank model is extended to include forced convection through the duct. Unlike Part 1, the convection coefficient $h$ is no longer prescribed but instead determined from internal flow correlations. This introduces coupling between the thermal and fluid systems, requiring an iterative solution.
-
-\subsubsection{Surrogate Duct and Flow Assumptions}
-
-The flow between fins is modeled as a series of identical rectangular ducts (also referred to as surrogate ducts), formed by the spacing between adjacent fins. The flow is assumed to be the following:
-\begin{itemize}
-    \item Steady-state
-    \item Fully developed and turbulent
-    \item One-dimensional in the axial direction
-\end{itemize}
-
-Under these assumptions, bulk properties of the flow can be related using conservation laws.
 
 \subsubsection{Reynolds Number and Mean Velocity}
 
@@ -227,11 +339,11 @@ The convection heat transfer coefficient is then
 h = \frac{Nu \, k_{\text{air}}}{D_h}
 \end{equation}
 
-Combining these relations yields an implicit dependence between $h$ and $Re_D$, requiring an iterative solution.
+Combining these relations yields an implicit dependence between $h$ and $Re_D$, requiring an iterative solution. %%FIXME not exactly true
 
 \subsubsection{Mass Flow Rate (Conservation of Mass)}
 
-Applying conservation of mass to the duct:
+Applying conservation of mass to the duct: %%FXIME incomplete sentence
 
 \begin{equation}
 \dot{m}_{\text{air}} = \rho A_c u_m
@@ -279,36 +391,6 @@ These are combined in series with the fin bank resistance:
 R_{\text{total, system}} = R_{\text{paste}} + R_{\text{cond}} + R_{\text{fin bank}}
 \end{equation}
 
-\subsubsection{Coupled Thermal–Fluid Solution}
-
-The fin bank resistance depends on the convection coefficient $h$, while $h$ depends on the Reynolds number, which depends on flow velocity and thus on $\dot{m}_{\text{air}}$. Meanwhile, $\dot{m}_{\text{air}}$ is determined from the energy balance, which depends on the total heat transfer rate.
-
-This creates a nonlinear coupling between:
-\begin{itemize}
-    \item Convection coefficient $h$
-    \item Reynolds number $Re_D$
-    \item Mass flow rate $\dot{m}_{\text{air}}$
-    \item Air temperature $T_{\infty}$
-\end{itemize}
-
-To resolve this, an iterative numerical method is employed. A trial value of $h$ is assumed, and the corresponding flow conditions and temperatures are computed. The resulting air temperature is compared to that predicted by the thermal resistance model, and the value of $h$ is adjusted until convergence is achieved.
-
-\subsubsection{Iterative Solution Procedure}
-
-The convection coefficient $h$ is implicitly coupled to the flow and thermal models through the Reynolds number, Nusselt equation, and energy balance. As a result, $h$ cannot be solved analytically and must be determined numerically.
-
-A root-finding approach is used to enforce consistency between the fluid and thermal models. Specifically, the solution is obtained by satisfying
-
-\begin{equation}
-f(h) = T_{\infty,\text{air}} - T_{\infty,\text{fin}} = 0
-\end{equation}
-
-where $T_{\infty,\text{air}}$ is computed from the energy balance and $T_{\infty,\text{fin}}$ is obtained from the thermal resistance network.
-
-An iterative search is performed by incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reduction of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
-
-At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, ensuring a self-consistent solution for the coupled thermal–fluid system.
-
 \subsubsection{Fan Performance and Power Requirement}
 
 Once the required volumetric flow rate is determined,
@@ -325,14 +407,11 @@ P_{\text{fan}} = 10{,}000 \left(\frac{Q_{\text{fan}}}{100{,}000}\right)^3
 
 This allows direct coupling between thermal requirements and system power consumption.
 
+\subsubsection{Verification of Part 2 Model}
+
+Accuracy of equations and verification of Part 2\\
+
 \subsection{Part 3 - Performance Analysis}
-\subsubsection{Introduction to Part 3}
-
-The third and final part of this project sought to use the models developed in the first two parts and evaluate their performances as a function of various design parameters for the fin bank (number of fins, fin thickness, fin length, etc.). The problem statement provided a defined fin bank geometry, which we were able to use to analyze the model's performance.  Additionally, the performance was computed used a given benchmark CPU performance score given by the problem statement.
-
-\subsubsection{Performance Analysis and Parametric Study}
-
-In Part 3, the validated thermal–fluid model is used to evaluate system performance as a function of key fin bank design parameters. The objective is to maximize the performance metric defined as the ratio of computational performance to total power consumption.
 
 \subsubsection{Performance Metric}
 
@@ -383,80 +462,6 @@ In addition to single-parameter sweeps, a two-dimensional analysis is performed 
 
 This analysis provides insight into how optimal fin design varies with operating conditions.
 
-\subsection{Assumptions}
-
-In order to properly complete this project, we had to make some assumptions along the way. The assumptions we made are as follows:
-\\
-\begin{quote}
-1. Assume all heat from CPUs is dissipated through the fin bank. This greatly reduced the amount of work and considerations needed for later calculations. 
-
-2. Assume 1-D heat transfer through the entire system (perpendicular to the duct wall and perpendicular . This is a typical assumption for fin bank analysis. 
-
-3. Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
-
-4. Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces work by preventing extra conduction between touching fins.
-
-5. Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply multiply by the number of fins.
-
-6. Assume perfectly caloric air. This helps us in our calculations of the volume flow rate of the air.
-
-7. Assume conservation of mass. This allows us to calculate the mean velocity of the air.
-
-8. Assume $T_{bulk} = 30^\circ C$. This allows us to compute many calculations that would be unsolvable otherwise, as well as determine certain values from a properties table. EXPLAIN IN FURTHER DETAIL ELSEWHERE 
-
-9. Assume turbulent airflow. This is to simplify several calculations, and is what we would expect from this type of duct and fin bank.
-\end{quote}
-
-\section{Calculations}
-\subsection{Diagrams}
-
-To assist in the completion of this project, we made several diagrams throughout. First, we made a diagram of the general fin bank geometry, seen below in Figure 1:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{Fin Bank Diagram.jpeg}
-    \caption{Fin Bank Diagram}
-\end{figure}
-
-From this diagram, we can see that the fin geometry is relatively simple. With an inside duct width of 15 cm, each side of the duct contains an equal number of fins, with the fins lined from one wall covering most of the distance to the other end. Each fin is of equal thickness and length, and each extends down the entire length of the duct. It is worth noting that this diagram does not represent the final number of fins per side of the duct, as the number was reduced for the sake of ease in producing the diagram.
-
-Next, we made a diagram showing the thermal resistance through the system. This can be found below in Figure 2:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{Thermal Resistance Diagram.jpg}
-    \caption{Thermal Resistance Diagram}
-\end{figure}
-
-Here we can see that the thermal resistance is mostly straightforward. We start on the outside of the duct at one of the CPUs, and go through the resistances of the paste and the duct itself, which are laid in series. Next, we go through the resistances of the actual fin bank and the duct area not covered by fins, which are laid in parallel. Finally, we culminate in $T_\infty$ at the center of the duct within the airflow.
-
-Next, we made a diagram showing the geometry of a single fin. This can be found below in Figure 3:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{Fin Diagram.JPG}
-    \caption{Fin Diagram}
-\end{figure}
-
-As per the requirements given in Table 1, each fin has a straight rectangular profile, which greatly simplifies the work of this project.
-
-Finally, we made a diagram showing the surrogate "duct" between each fin, which we used to find the airflow between each fin. This can be found in Figure 4:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{Surrogate Duct Diagram.JPG}
-    \caption{Surrogate "Duct" Diagram}
-\end{figure}
-
-Here we can see that the area between two fins is large enough to warrant calculating the airflow between them. Normally, this would be tedious to calculate as an open system. However, because the opening of the "duct" to the main airway is relatively small compared to the length of the fins, we can treat this "duct" as a fully enclosed duct for the sake of ease.
-
-\subsection{Verification of Part 1 Model}
-
-Once our model was complete, we verified its functionality by using it to solve Example 2.11(a) from Slide 79 on the Thermal Conduction notes, previously solved in class by Dr. Miller. Our model gave us a maximum allowable power dissipation per CPU of 53.1908 W and an air volume flow rate of 0.1903 kg/s. In class, we calculated a power dissipation of 53.2 W and a flow rate of 0.19 kg/s, thus verifying our model.
-
-\subsection{Verification of Part 2 Model}
-
-Accuracy of equations and verification of Part 2\\
 
 \subsection{Table of Compliance}
 
@@ -530,19 +535,20 @@ As can be seen from the graph of performance versus fin length L, there is a rap
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Performance_PCPU_N.png}
-    \caption{Performance With Varying $P_{CPU}$ and Number of Fins}
+    \caption{Performance vs. Single $P_{PCU}$ and Total Number of Fins}
 \end{figure}
 
 The above surface plot illustrates the relationship between system performance, CPU power, and fin count. Increasing the number of fins generally improves performance due to the added heat transfer area, while increasing CPU power initially increases performance due to higher computational output. However, at higher power levels, the required cooling becomes more demanding, and the fan power increases rapidly due to its nonlinear dependence on airflow. As a result, performance gains begin to diminish, especially at high CPU power and high fin counts, where the cooling system becomes the limiting factor. This demonstrates that while both increasing fin count and CPU power can improve performance, their combined effects are constrained by the efficiency and power requirements of the cooling system. 
 
 \subsection{Evaluation of Assumptions From Part 1 and 2 Based on Results}
+%%FIXME there needs to be something here about the Reynolds number
 
 \section{Conclusions}
 
 Conclude the stupid project
 \newpage
 \section{Appendices}
-
+\subsection{Data Tables}
 \begin{table}[H]
 \centering
 \caption{Performance vs. Fin Material (Conductivity)}
@@ -665,7 +671,7 @@ $L$ (meters) & $Performance$ & $P_{\mathrm{fan}} (W)$ & $Re_D$ & $T_{m,e} (^\cir
 \caption{Performance vs. Single $P_{PCU}$ and Total Number of Fins}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\diagbox{$P_{CPU}$}{$N$} & 1 & 26 & 51 & 76 & 101 & 126 & 151 & 176 & 201 & 226 \\
+\diagbox{\tiny $P_{CPU} (W)$}{\tiny $N$} & 1 & 26 & 51 & 76 & 101 & 126 & 151 & 176 & 201 & 226 \\
 \hline
 10 & 16.94 & 19.61 & 19.63 & 19.64 & 19.64 & 19.64 & 19.64 & 19.64 & 19.64 & 19.64 \\\hline
 28 & 4.35 & 16.15 & 16.55 & 16.58 & 16.59 & 16.59 & 16.59 & 16.59 & 16.59 & 16.59 \\\hline
@@ -681,8 +687,42 @@ $L$ (meters) & $Performance$ & $P_{\mathrm{fan}} (W)$ & $Re_D$ & $T_{m,e} (^\cir
 \end{tabular}
 \end{table}
 
+\subsection{MATLAB Code}
+\subsubsection{part1.m}
+\begin{verbatim}
+clear
+%% Load and Define Constants
+constants
+constants_part1
 
-\subsection{part1.m}
+%% Calculate Fin Efficiency
+m = sqrt((2 * h) / (k * t));         %constant for calculating efficiency
+L_c = L + t / 2;                     %corrected fin length, meters
+eta_fin = tanh(m * L_c) / (m * L_c); %single fin efficiency
+
+%% Calculate Areas
+A_b = w * t;                         %area of single fin base, meters^2
+A_fin = 2 * w * L_c;                 %area of single fin, meters^2
+A_fins = N * A_fin;                  %area of all of the fins, meters^2
+A_nofins = L_SIDE * L_DUCT * 4;      %area with fins removed, meters^2
+A_unfin = A_nofins - N * A_b;        %area of fin bank with no fins, meters^2
+A_tot = A_fins + A_unfin;            %total area of fin bank, meters^2
+%eta_tot = 1 - ((A_fins) / (A_tot)) * (1 - eta_fin); %unused total efficiency
+
+%% Calculate Fin Convection Resistance
+%R_tot = 1 / (h * A_tot * eta_tot) 
+R_fins = 1 / (h * A_fins * eta_fin); %fins convection thermal resistance, K/W
+R_unfin = 1 / (h * A_unfin);         %unfin convection thermal resistance, K/W
+R_tot = 1/(1/R_fins+1/R_unfin);      %total resistance - parallel resistors, K/W
+
+%% a) Determine Maximum allowable power dissipation per transistor
+Q_dot_tot = (T_b-T_inf)/R_tot;       %heat transfer rate, W
+Q_dot_tran = Q_dot_tot/N_CPU         %allowed power per transistor
+
+%% b) Determine Required Volume Flow Rate of Air
+%assume perfectly caloric
+m_dot_air = Q_dot_tot/(c_p*dT_air)   %minimum volume flow rate, kg/s
+\end{verbatim}
 \noindent
 \(
 \textbf{Fin Efficiencies}\\
@@ -727,7 +767,36 @@ $\dot{Q}_{tran} = \frac{\dot{Q}_{tot}}{N_{CPU}}$ & Allowed power per CPU \\
 \\
 \dot{m}_{air} = \frac{\dot{Q}_{tot}}{c_p\Delta T_{air}}
 \)
-\subsection{part2.m}
+\subsubsection{part2.m}
+\begin{verbatim}
+clear
+%% Load and Define Constants
+constants
+constants_part2
+P_CPU = 53.2;
+P_CPUs = P_CPU*N_CPU;                     %CPU Power, W, VARIABLE
+CPU_perf = 39000*(1-exp(-.02*P_CPU));    %CPU Performance Score
+
+%asssume T_bulk = 35C
+[h, Re_D, T_me] = findh2(P_CPUs, h_c, t_DUCT, A_c, D_h, ...
+    T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, ...
+    t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+
+%% Calculate Mean Velocity
+%assume conservation of mass to use:
+%Reynolds number for surrogate duct:
+u_m = Re_D * nu / D_h
+
+%% Calculate mass flow rate
+%given T_me = T_mi + Q_dot/(m_dot * c_p)
+m_dot_air = rho * A_c * u_m; %kg/s %Q_dot_tot/(c_p*(T_me-T_mi))
+%commented out is the necessary m_dot - requires iterative solution
+
+%Q_fan conversion
+Q_fan = (m_dot_air / rho) * 60 * 1000; %In L/min
+
+P_fan = ((Q_fan/100000)^3)*10000
+\end{verbatim}	
 \noindent
 \(
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
@@ -772,7 +841,259 @@ $h = \frac{Nu*k}{D_h}$ & Convection heat transfer coefficient (W/(m$^2$*k) \\
 T_{\infty} = T_{bulk}\\
 T_b = \frac{90R_{tot} + T_{\infty}(R_{paste} + R_{cond})}{R_{tot} + R_{paste} + R_{cond}}\\
 \)
-\subsection{constants.m}
+\subsubsection{part3.m}
+\begin{verbatim}
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000; %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU; %total CPU Power, W
+
+%% Vary L
+
+n = 1
+x = 0:0.0032:0.08
+for L = x
+[y(n), P_fan(n), Re_D(n), T_me(n)] = perf(CPU_perf, P_CPUs, ...
+    h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+    A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+n = n + 1;
+end
+plot(x,y)
+title('Performance vs Fin Length')
+xlabel('Fin Length L (m)')
+ylabel('PassMark Benchmark Score (All CPUs)')
+bob1 = [x; y; P_fan; Re_D; T_me];
+bob1 = transpose(bob1);
+
+
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000; %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU; %total CPU Power, W
+
+%% Vary N
+
+n = 1
+x = 0:10:250
+for N = x
+[y(n), P_fan(n), Re_D(n), T_me(n)] = perf(CPU_perf, P_CPUs, ...
+    h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+    A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+n = n + 1;
+end
+plot(x,y)
+title('Performance vs Fin Count')
+xlabel('Fin Count N')
+ylabel('PassMark Benchmark Score (All CPUs)')
+bob2 = [x; y; P_fan; Re_D; T_me];
+bob2 = transpose(bob2);
+
+
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000; %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU; %total CPU Power, W
+
+%% Vary t
+
+n = 1
+x = 0.00001:0.0002:0.005
+for t = x
+    [y(n), P_fan(n), Re_D(n), T_me(n)] = perf(CPU_perf, P_CPUs, ...
+        h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+        A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    n = n + 1;
+end
+plot(x,y)
+title('Performance vs Fin Thickness')
+xlabel('Fin Thickness t (m)')
+ylabel('PassMark Benchmark Score (All CPUs)')
+bob3 = [x; y; P_fan; Re_D; T_me];
+bob3 = transpose(bob3);
+
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000; %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU; %total CPU Power, W
+
+%% Vary Material
+
+n = 1
+x = 16:40:1000
+for k_duct = x
+    [y(n), P_fan(n), Re_D(n), T_me(n)] = perf(CPU_perf, P_CPUs, ...
+        h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+        A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    n = n + 1;
+end
+plot(x,y)
+title('Performance vs Fin Material (Conductivity)')
+xlabel('Fin Thermal Conductivity (W/(m*K))')
+ylabel('PassMark Benchmark Score (All CPUs)')
+bob4 = [x; y; P_fan; Re_D; T_me];
+bob4 = transpose(bob4);
+
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+[N, P_CPU] = meshgrid(1:25:250, 10:18:190);
+P_CPUs = P_CPU*36;
+CPU_perf = 39000*(1-exp(-.02*P_CPU));    %CPU Performance Score
+performance = zeros(size(CPU_perf));
+for i = 1:size(CPU_perf, 1)
+    for j = 1:size(CPU_perf, 2)
+        [performance(i,j), P_fan(i,j), Re_D(i,j), T_me(i,j)] = ...
+            perf(CPU_perf(i,j), P_CPUs(i,j), h_c, t_DUCT, ...
+            T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, ...
+            N(i,j), t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    end
+end
+surf(N, P_CPU, performance)
+title('Performance over P_{CPU} and N')
+xlabel('Total Fin Count N')
+ylabel('Single CPU Power P_{CPU} (W)')
+zlabel('PassMark Benchmark Score (All CPUs)')
+
+\end{verbatim}
+\subsubsection{findh2.m}
+\begin{verbatim}
+function [h, Re_D, T_me] = findh2(P_CPUs, h_c, t_DUCT, A_c, ...
+    D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, ...
+    t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+%convection heat transfer coefficient, W/(m^2*K) CHECK UNITS
+    it = 1;
+    precision = 0.00001;
+    h = 1;
+    while it >= precision
+        [new, Re_D, T_me] = tinf(P_CPUs, h, h_c, t_DUCT, ...
+            A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+            A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+        while new >= 0
+            [new, Re_D, T_me] = tinf(P_CPUs, h, h_c, t_DUCT, ...
+                A_c, D_h, T_mi, c_p, k_air, k_duct, ...
+                A_c_walls, A_c_CPUs, N, t, L, L_SIDE, ...
+                L_DUCT, w, rho, nu, Pr);
+            h = h + it;
+        end
+        h = h - 2 * it;
+        it = it/10;
+    end
+end
+
+\end{verbatim}
+\subsubsection{perf.m}
+\begin{verbatim}
+function [perf_out, P_fan, Re_D, T_me] = perf(CPU_perf, P_CPUs, ...
+    h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, ...
+    A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+    s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
+    A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
+    D_h = (2*L*s)/(L+s); %Hydraulic diameter of surragate duct, meters
+    [h, Re_D, T_me] = findh2(P_CPUs, h_c, t_DUCT, A_c, D_h, ...
+        T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, ...
+        t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+
+    %% Calculate Mean Velocity
+    %assume conservation of mass to use:
+    %Reynolds number for surrogate duct:
+    u_m = Re_D * nu / D_h
+    
+    %% Calculate mass flow rate
+    %given T_me = T_mi + Q_dot/(m_dot * c_p)
+    m_dot_air = rho * A_c * u_m; %kg/s %Q_dot_tot/(c_p*(T_me-T_mi))
+    %commented out is the necessary m_dot - requires iterative solution
+    
+    %Q_fan conversion
+    Q_fan = (m_dot_air / rho) * 60 * 1000;   %In L/min
+    
+    P_fan = ((Q_fan/100000)^3)*10000;
+
+    perf_out = CPU_perf/(P_CPUs+P_fan);
+end
+\end{verbatim}
+\subsubsection{tinf.m}
+\begin{verbatim}
+function [diff, Re_D, T_me] = tinf(P_CPUs, h, h_c, t_DUCT, ...
+    A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, ...
+    N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+    Q_dot_tot = P_CPUs;
+    
+    %% Calculate Reynolds Number
+    %Nusselt Number Eqn:
+    Re_D = ((h*D_h)/(k_air*0.023*Pr^0.4))^(1/0.8); %Reynolds number for the duct
+    
+    %% Calculate Mean Velocity
+    %assume conservation of mass to use:
+    %Reynolds number for surrogate duct:
+    u_m = Re_D * nu / D_h;
+    
+    %% Calculate mass flow rate
+    %given T_me = T_mi + Q_dot/(m_dot * c_p)
+    m_dot_air = rho * A_c * u_m; %kg/s %Q_dot_tot/(c_p*(T_me-T_mi))
+    %commented out is the necessary m_dot - requires iterative solution
+    
+    T_inf_air = (Q_dot_tot/(m_dot_air*c_p) + 2 * T_mi)/2;
+    
+    %% Calculate Thermal Resistances
+    R_paste = 1/(h_c * A_c_CPUs);            
+    R_cond = t_DUCT/(k_duct * A_c_walls);
+    
+    %% Calculate Fin Efficiency
+    m = sqrt((2 * h) / (k_duct * t));    %constant for calculating efficiency
+    L_c = L + t / 2;                     %corrected fin length, meters
+    eta_fin = tanh(m * L_c) / (m * L_c); %single fin efficiency
+    
+    %% Calculate Areas
+    A_b = w * t;                         %area of single fin base, meters^2
+    A_fin = 2 * w * L_c;                 %area of single fin, meters^2
+    A_fins = N * A_fin;                  %area of all of the fins, meters^2
+    A_nofins = L_SIDE * L_DUCT * 4;      %area with fins removed, meters^2
+    A_unfin = A_nofins - N * A_b; %area of fin bank with no fins, meters^2
+    A_tot = A_fins + A_unfin;            %total area of fin bank, meters^2
+    %eta_tot = 1 - ((A_fins) / (A_tot)) * (1 - eta_fin);
+    %unused total efficiency
+    
+    %% Calculate Fin Convection Resistance
+    %R_tot = 1 / (h * A_tot * eta_tot) 
+    %fins convection thermal resistance, K/W
+    R_fins = 1 / (h * A_fins * eta_fin);
+    R_unfin = 1 / (h * A_unfin); %unfin convection thermal resistance, K/W
+    %total resistance - parallel fin and unfin resistors, K/W
+    R_tot = 1/(1/R_fins+1/R_unfin);
+    
+    T_inf_fin = 90 - Q_dot_tot * (R_paste + R_cond + R_tot);
+    
+    diff = T_inf_air - T_inf_fin;
+
+    T_me = Q_dot_tot/(m_dot_air * c_p) +T_mi;
+end
+\end{verbatim}
+\subsubsection{constants.m}
+\begin{verbatim}
+%% Define Constants
+% All parts
+N = 24*4;                            %total number of fins
+N_CPU = 9*4;                         %total number of CPU's
+t = 0.002;                           %fin thickness, meters
+L = 0.025;                           %fin length, meters
+L_SIDE = 0.15;                       %Duct side len, meters
+L_DUCT = 0.15;                       %Duct len, meters
+w = L_DUCT;                          %fin width, meters
+\end{verbatim}
 \noindent
 \(
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
@@ -785,7 +1106,16 @@ $L_{duct} = 0.15$ & Duct length, meters \\
 $w = L_{duct}$ & Fin width, meters \\
 \end{tabular*}
 \)
-\subsection{constants\_part1.m}
+\subsubsection{constants\_part1.m}
+\begin{verbatim}
+h = 50; %convection heat transfer coefficient, W/(m^2*K)
+k = 178;                             %thermal conductivity, W/(m*K)
+T_inf = 310;                         %average air temp through box passageway, K
+T_b = 360;                           %maximum transistor temperature at base
+c_p = 1006;                          %c_p for air, J/(kg*K)
+rho = 1.14;                          %air density, kg/m^3
+dT_air = 10;                         %maximum change in air temp, K
+\end{verbatim}
 \noindent
 \(
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
@@ -798,7 +1128,30 @@ $\rho = 1.14$ & Air density, kg/m$^3$ \\
 $\Delta T_{air} = 10$ & Maximum change in air temp, K \\
 \end{tabular*}
 \)
-\subsection{constants\_part2\_3.m}
+\subsubsection{constants\_part2.m}
+\begin{verbatim}
+t_DUCT = 0.01;                       %Duct thickness, meters
+s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
+A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
+D_h = (2*L*s)/(L+s); %Hydraulic diameter of surragate duct, meters
+T_mi = 20;                  %mean inlet temperature, degC
+%T_me = 30;                  %maximum mean duct exit temperature, degC
+%Specific heat of air between 15 and 70 deg C, J/(kg*K) FROM TABLE
+c_p = 1007;
+k_duct = 392 %thermal conductivity, CHOSEN MATERIAL @T_bulk??
+k_air = 0.02625 %W/(m*K), based on a temperature of T_bulk, FROM TABLE
+%Cross sectional area of duct side for conduction, m^2 IGNORES CORNER AREA
+A_c_walls = L_DUCT * L_SIDE * 4;
+%total cross sectional area of CPUs for contact resistance, m^2
+A_c_CPUs = 0.0014 * N_CPU;
+%thermal paste thermal contact coefficient, W/(m^2*K) PICK AN ACTUAL PASTE
+h_c = 30000
+rho = 1.145; %kg/m^3, based on a temperature of T_bulk, FROM TABLE
+nu = 1.655e-5; %m^2/s assumed based on a temperature of T_bulk, FROM TABLE
+%Prandtl number, assumed based on a temperature of T_bulk, FROM TABLE
+Pr = 0.7268;
+
+\end{verbatim}
 \noindent
 \(
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
@@ -814,4 +1167,25 @@ $A_{c\ CPUs} = 0.0014*9$ & Total cross sectional area of CPUs for contact resist
 $h_c = 6$ & Thermal paste thermal contact coefficient, W/(m$^2$*K) \\
 \end{tabular*}
 \)
+
+\subsubsection{constants\_part3.m}
+\begin{verbatim}
+t_DUCT = 0.01;                       %Duct thickness, meters
+T_mi = 20;                  %mean inlet temperature, degC 
+%T_me = 30;                  %maximum mean duct exit temperature, degC
+%Specific heat of air between 15 and 70 deg C, J/(kg*K) FROM TABLE
+c_p = 1007;
+k_duct = 392 %thermal conductivity, CHOSEN MATERIAL @T_bulk??
+k_air = 0.02625 %W/(m*K), based on a temperature of T_bulk, FROM TABLE
+%Cross sectional area of duct side for conduction, m^2 IGNORES CORNER AREA
+A_c_walls = L_DUCT * L_SIDE * 4;
+%total cross sectional area of CPUs for contact resistance, m^2
+A_c_CPUs = 0.0014 * N_CPU;
+%thermal paste thermal contact coefficient, W/(m^2*K) PICK AN ACTUAL PASTE
+h_c = 30000
+rho = 1.145; %kg/m^3, based on a temperature of T_bulk, FROM TABLE
+nu = 1.655e-5; %m^2/s assumed based on a temperature of T_bulk, FROM TABLE
+%Prandtl number, assumed based on a temperature of T_bulk, FROM TABLE
+Pr = 0.7268;
+\end{verbatim}
 \end{document}

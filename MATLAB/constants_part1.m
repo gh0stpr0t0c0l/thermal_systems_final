@@ -1,4 +1,4 @@
-h = 50;                              %convection heat transfer coefficient, W/(m^2*K)
+h = 50; %convection heat transfer coefficient, W/(m^2*K)
 k = 178;                             %thermal conductivity, W/(m*K)
 T_inf = 310;                         %average air temp through box passageway, K
 T_b = 360;                           %maximum transistor temperature at base
