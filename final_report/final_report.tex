@@ -47,18 +47,18 @@ Simon's here
 \newpage
 \section{Introduction}
 
-In this Thermal Systems project, we set out to design a fin bank for a given duct,  create a model describing the system as a whole, and analyze how changing different variables within the model affects the system. The geometry of the duct itself was given to us. To simplify the task, this project was split into three parts, described below.
+In this Thermal Systems project, we set out to design a fin bank for a given duct,  create a model describing the system as a whole, and analyze how changing different variables within the model affects the system. The geometry of the duct itself was given to us, and remains unmodified until the end of the project. To simplify the task, this project was split into three parts, described below.
 
 \subsection{Part 1 - Fin Bank}
 \subsubsection{Introduction to Part 1}
 
 The first part of this project focused on developing the model used to describe convective heat transfer within the fin bank. While there were many ways to model the system (dedicated iterative solver software, Python, etc.) we chose to use MATLAB because of its familiarity and ease setup among teammates with the required software. 
 
-Part 1 was the most straightforward of the project, simply consisting of calculating various parameters required for describing the fin bank. This included fin efficiencies, fin bank areas, and thermal resistances. After creating this model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in Figures XXX-XXX in the appendix. %%FIXME
+Part 1 was the most straightforward of the project, simply consisting of calculating various parameters required for describing the fin bank. This included fin efficiencies, fin bank areas, and thermal resistances. After creating this model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in the appendix. %%FIXME
 
-\subsubsection{Governing Equations and Modeling Methodology}
+\subsubsection{Thermal Resistance Equation and Modeling Methodology}
 
-The given fin bank is modeled using one-dimensional, steady-state heat transfer combined with the thermal resistance method. This approach follows the same methodology used in Example 2.11 from the course notes, where heat transfer is modeled analogous to electrical current flow through resistors.
+The given fin bank is modeled using one-dimensional, steady-state heat transfer combined with the thermal resistance method. This approach follows the same methodology used in Example 2.11 from the course notes, where heat transfer is modeled in analog to electrical current flow through resistors.
 
 Under these assumptions, the total heat transfer rate is expressed as
 
@@ -66,9 +66,7 @@ Under these assumptions, the total heat transfer rate is expressed as
 \dot{Q} = \frac{T_b - T_{\infty}}{R_{\text{tot}}}
 \end{equation}
 
-where $T_b$ is the duct base temperature, $T_{\infty}$ is the bulk air temperature, and $R_{\text{tot}}$ is the total thermal resistance of the fin bank.
-
-\vspace{0.5em}
+where $T_b$ is the duct base temperature, $T_{\infty}$ is the temperature of the fluid, and $R_{\text{tot}}$ is the total thermal resistance of the fin bank.
 
 The modeling procedure follows a structured five-step process:
 
@@ -83,52 +81,35 @@ The modeling procedure follows a structured five-step process:
 \subsection{Part 2 - Cooling System}
 \subsubsection{Introduction to Part 2}
 
-The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
+The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This proved to be a challenge, since there are many parts of the problem that are a function of the convective heat transfer coefficient $h$. Ultimately, we decided to create a system that can iteratively solve for this coefficient, given a certain fin thermal resistance and using the conservation of energy. To simplify the calculation of $h$, we treated the space between the fins as an enclosed duct and calculated the Reynolds number for this space. The diagram for this surrogate duct can be found in Figure XXX. %%FIXME
 
-\subsubsection{Cooling Flow Model and Convective Heat Transfer}
+Part 2 of the project was the most computationally complex by far, due to computing hydraulic diameter and Reynolds number for the flow between fins, the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
 
-In Part 2, the fin-bank model is extended to include forced convection through the duct. Unlike Part 1, the convection coefficient $h$ is no longer prescribed but instead determined from internal flow correlations. This introduces coupling between the thermal and fluid systems, requiring an iterative solution.
+\subsubsection{Cooling Flow Model with Convective Heat Transfer}
+
+In Part 2, the fin-bank model is extended to include forced convection through the duct. Unlike Part 1, the convection coefficient $h$ is no longer prescribed but instead determined by modeling the fluid flow. Because of this, the heat transfer of the system can be determined from two sides: the conduction/convection of the fins and the conservation of energy. This introduces a coupling of the two halves that can be solved iteratively for an $h$ that satisfies both.
+
+In other words, $\dot{Q}$ (the heat that can be dissipated by the system) can be determined as described in Part 1 above. $\dot{Q}$ can also be determined by applying the conservation of energy:
+
+\begin{equation}
+\dot{Q} = \dot{m}c_p(T_{m,e}-T_{m,i})
+\end{equation} 
+
+where $T_{m,e}$ and $T_{m,i}$ are the exit and inlet temperatures of the duct, respectively; $\dot{m}$ is the mass flow rate through the duct; and $c_p$ is the specific heat of the air.
+
+By setting these values equal to each other with $h$ as an independent variable, an algebraic loop is created that can be solved by iteration. This produces a value for $h$ and $T_{m,e}$.
+
+However, we decided to break the algebraic loop at a slightly different point so that we could express $h$ and $T_{m,e}$ as function of $\dot{Q}_{CPU}$. This is because with the method discussed above, the $\dot{Q}$ value drops out of the equation and thus is not an independent variable. Since the problem statement requires setting $\dot{Q}_{CPU}$, this modification was necessary.
+
+To accomplish this change, we decided to solve both sides for $T_{bulk}$, the free-stream average temperature in the duct. Note that in Part 1, $T_{\infty} = T_{bulk}$. Setting the bulk temperature for each half equal allows us to set $\dot{Q}_{CPU}$ and solve for the desired variables. This procedure is outlined in more detail in the Calculations section below.
+
+We built a simple iterative solver in MATLAB which performs a search incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reduction of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
+
+At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, allowing for complete definition of the system
 
 \subsubsection{Surrogate Duct and Flow Assumptions}
 
-The flow between fins is modeled as a series of identical rectangular ducts (also referred to as surrogate ducts), formed by the spacing between adjacent fins. The flow is assumed to be the following:
-\begin{itemize}
-    \item Steady-state
-    \item Fully developed and turbulent
-    \item One-dimensional in the axial direction
-\end{itemize}
-
-Under these assumptions, bulk properties of the flow can be related using conservation laws.
-
-\subsubsection{Coupled Thermal–Fluid Solution}
-
-The fin bank resistance depends on the convection coefficient $h$, while $h$ depends on the Reynolds number, which depends on flow velocity and thus on $\dot{m}_{\text{air}}$. Meanwhile, $\dot{m}_{\text{air}}$ is determined from the energy balance, which depends on the total heat transfer rate.
-
-This creates a nonlinear coupling between:
-\begin{itemize}
-    \item Convection coefficient $h$
-    \item Reynolds number $Re_D$
-    \item Mass flow rate $\dot{m}_{\text{air}}$
-    \item Air temperature $T_{\infty}$
-\end{itemize}
-
-To resolve this, an iterative numerical method is employed. A trial value of $h$ is assumed, and the corresponding flow conditions and temperatures are computed. The resulting air temperature is compared to that predicted by the thermal resistance model, and the value of $h$ is adjusted until convergence is achieved.
-
-\subsubsection{Iterative Solution Procedure}
-
-The convection coefficient $h$ is implicitly coupled to the flow and thermal models through the Reynolds number, Nusselt equation, and energy balance. As a result, $h$ cannot be solved analytically and must be determined numerically.
-
-A root-finding approach is used to enforce consistency between the fluid and thermal models. Specifically, the solution is obtained by satisfying
-
-\begin{equation}
-f(h) = T_{\infty,\text{air}} - T_{\infty,\text{fin}} = 0
-\end{equation}
-
-where $T_{\infty,\text{air}}$ is computed from the energy balance and $T_{\infty,\text{fin}}$ is obtained from the thermal resistance network.
-
-An iterative search is performed by incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reduction of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
-
-At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, ensuring a self-consistent solution for the coupled thermal–fluid system.
+To make these calculations possible, the flow between fins is modeled as a series of identical rectangular ducts (referred to as surrogate ducts), formed by the spaces between adjacent fins. This simplifies the Reynolds number calculation since these spaces are rectangular. This is a reasonable assumption because most of the convective heat transfer occurs within these spaces. The flow is also assumed to be Turbulent and fully developed, since this also greatly simplifies the calculation. These assumptions will be evaluated in a later section.
 
 \subsection{Part 3 - Performance Analysis}
 \subsubsection{Introduction to Part 3}
