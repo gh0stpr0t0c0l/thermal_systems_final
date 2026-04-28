@@ -80,7 +80,7 @@ The modeling procedure follows a structured four-step process (simplified from t
 \subsection{Part 2 - Cooling System}
 \subsubsection{Introduction to Part 2}
 
-The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This proved to be a challenge, since there are many parts of the problem that are a function of the convective heat transfer coefficient $h$. Ultimately, we decided to create a system that can iteratively solve for this coefficient, given a certain fin thermal resistance and using the conservation of energy. To simplify the calculation of $h$, we treated the space between the fins as an enclosed duct and calculated the Reynolds number for this space. The diagram for this surrogate duct can be found in Figure XXX. %%FIXME
+The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This proved to be a challenge, since there are many parts of the problem that are a function of the convective heat transfer coefficient $h$. Ultimately, we decided to create a system that can iteratively solve for this coefficient, given a certain fin thermal resistance and using the conservation of energy. To simplify the calculation of $h$, we treated the space between the fins as an enclosed duct and calculated the Reynolds number for this space. The diagram for this surrogate duct can be found in Figure 4.
 
 Part 2 of the project was the most computationally complex by far, due to computing hydraulic diameter and Reynolds number for the flow between fins, the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
 
@@ -490,7 +490,7 @@ CPU_{\text{perf}} = 39000\left(1 - e^{-0.02P_{CPUs}}\right)
 \end{equation}
 
 which can be inverted to determine the required CPU power for a specified performance level. 
-(\ref{eq:ref}) seems like it should probably use single CPU power, since CPU performance is very high even with low CPU power, but for our project, we have followed the the problem statement document and used total CPU power. This may result in lower overall performance scores.
+(\ref{eq:ref}) seems like it should probably use single CPU power, since CPU performance is very high even with low CPU power, but for our project, we have followed the problem statement document and used total CPU power. This may result in lower overall performance scores.
 
 The function \texttt{perf.m} (see appendix) is used to evaluate this system performance score for a given fin geometry and operating condition by solving the coupled models described in detail above. It internally determines the convection coefficient through the iterative procedure, computes the required airflow and fan power, and returns the ratio of CPU performance to total system power.
 
@@ -527,7 +527,7 @@ This analysis provides insight into how optimal fin design varies with operating
 \begin{tabular}{|p{8cm}|p{8cm}|}
 \hline
 \quad \quad \quad \quad \quad \quad \quad Requirement & \quad \quad \quad \quad \quad \quad \quad  Compliance \\ \hline
-The inner dimensions \textit{shall} be 15-cm by 15-cm. & Our design has an inner dimension of 15-cm by 1-cm.  \\ \hline
+The inner dimensions \textit{shall} be 15-cm by 15-cm. & Our design has an inner dimension of 15-cm by 15-cm.  \\ \hline
 The total length of the duct \textit{shall} be 15 cm. & Our design has a total duct length of 15 cm.  \\ \hline
 The duct wall thickness \textit{shall} be 1 cm. & Our design has a duct wall thickness of 1 cm.  \\ \hline
 Nine CPUs \textit{shall} be attached to each side surface of the duct. & Our design has 9 CPUs on each side of the duct.  \\ \hline
@@ -603,13 +603,13 @@ The above surface plot illustrates the relationship between system performance, 
 
 Looking back at our assumptions, most were either correct (for instance, scientific laws) or incredibly useful in simplifying our calculations (like 1-dimensional heat transfer). For example, the typical fin bank assumptions (1-D heat transfer, thin fins, steady state, etc.) reduced a great deal of work in this project. Additionally, assumptions such as perfectly caloric air, conservation of mass, and negligible changes in kinetic and potential energy allowed us to perform calculations that would otherwise be either very difficult or unsolvable with what we have learned in this class.
 
-However, not all of our assumptions were correct. Specifically, we assumed that the airflow would be turbulent, as this would be expected from this type of duct and fin bank. During our Part 1 calculations, however, we found that the Reynold's number for our design was 1,878.5. While this isn't too far off from the requirement for turbulent airflow (roughly 4,000), it is still low enough to be classified as laminar flow, which is not what we expected. That said, since we would expect the motion of the fan to introduce turbulent flow, it is likely still a good assumption.
+However, not all of our assumptions were correct. Specifically, we assumed that the airflow would be turbulent, as this would be expected from this type of duct and fin bank. During our Part 1 calculations, however, we found that the Reynolds number for our design was 1,878.5. While this isn't too far off from the requirement for turbulent airflow (roughly 4,000), it is still low enough to be classified as laminar flow, which is not what we expected. That said, since we would expect the motion of the fan to introduce turbulent flow, it is likely still a good assumption.
 
 Also of note is our assumption of $T_{bulk}$. As described above, with our solution method we were able to compare our calculation with our assumed value and choose an assumption that matched our results.
 
 \section{Conclusions}
 
-After analyzing our results, we can conclude that while there are numerous variables that affect the overall performance of the duct system, a few in particular affect the performance more than others. Fin count and fin length specifically seem to have a greater variation of performance based on their value, especially when compared to duct material and fin thickness. This makes sense, as fin count and length affect the fin surface area significantly more than fin thickness and duct material. The surface area than drastically changes how much heat is able to be transferred.
+After analyzing our results, we can conclude that while there are numerous variables that affect the overall performance of the duct system, a few in particular affect the performance more than others. Fin count and fin length specifically seem to have a greater variation of performance based on their value, especially when compared to duct material and fin thickness. This makes sense, as fin count and length affect the fin surface area significantly more than fin thickness and duct material. The surface area then drastically changes how much heat is able to be transferred.
 
 Additionally, we noted that regardless of how you change the variables, there appears to be a natural ceiling to what the overall performance can reach. Notice that in the plots for each variable, each one maxes out around 11.36. This tells us that although you can easily get worse performance by changing variables, you can only improve the performance so much until you reach diminishing returns. 
 
