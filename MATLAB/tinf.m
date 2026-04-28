@@ -1,5 +1,5 @@
-function [diff, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
-    Q_dot_tot = P_CPU;
+function [diff, Re_D, T_me] = tinf(P_CPUs, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+    Q_dot_tot = P_CPUs;
     
     %% Calculate Reynolds Number
     %Nusselt Number Eqn:
@@ -43,9 +43,6 @@ function [diff, Re_D] = tinf(P_CPU, h, h_c, t_DUCT, A_c, D_h, T_mi, c_p, k_air, 
     T_inf_fin = 90 - Q_dot_tot * (R_paste + R_cond + R_tot);
     
     diff = T_inf_air - T_inf_fin;
+
+    T_me = Q_dot_tot/(m_dot_air * c_p) +T_mi;
 end
-
-
-%P_fan = 1000;                            %Fan Power, W, VARIABLE
-%P_tot = P_CPU + P_fan;
-%Q_fan = (100000*(P_fan/10000)^(1/3))/(1000*60)   %Fan Flowrate, m^3/s

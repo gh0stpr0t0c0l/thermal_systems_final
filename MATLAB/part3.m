@@ -1,48 +1,88 @@
+clear
+figure
 %% Load and Define Constants
 constants
-%P_CPU =                             %CPU Power, W, VARIABLE
-%P_fan =                             %Fan Power, W, VARIABLE
+constants_part3
+CPU_perf = 30000;                                               %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU;                  %total CPU Power, W
 
-%% Calculate Mass Flow Rate
+%% Vary L
+
+n = 1
+x = 0:0.0001:0.08
+for L = x
+y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+n = n + 1;
+end
+plot(x,y)
 
 
-%% Calculate Air Density (Assume temperature, pressure??)
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000;                                               %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU;                  %total CPU Power, W
+
+%% Vary N
+
+n = 1
+x = 0:1:250
+for N = x
+y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+n = n + 1;
+end
+plot(x,y)
 
 
-%% Calculate Mean Velocity
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000;                                               %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU;                  %total CPU Power, W
 
-%% Calculate Surrogate Duct Reynolds Number
-Re_D = (U_m * D_h) / nu;
+%% Vary t
 
-%% Calculate Convection Heat Transfer Coefficient
+n = 1
+x = 0.00001:0.00001:0.005
+for t = x
+    y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    n = n + 1;
+end
+plot(x,y)
 
-h = 50                              %convection heat transfer coefficient, PART 2
+clear
+figure
+%% Load and Define Constants
+constants
+constants_part3
+CPU_perf = 30000;                                               %CPU Performance Score, single CPU
+P_CPUs = -(log(1-CPU_perf/39000))/(0.02)*N_CPU;                  %total CPU Power, W
 
-%% Calculate Fin Efficiency
-m = sqrt((2 * h) / (k * t));         %constant for calculating efficiency
-L_c = L + t / 2;                     %corrected fin length, meters
-eta_fin = tanh(m * L_c) / (m * L_c); %single fin efficiency
+%% Vary Material
 
-%% Calculate Areas
-A_b = w * t;                         %area of single fin base, meters^2
-A_fin = 2 * w * L_c;                 %area of single fin, meters^2
-A_fins = N * A_fin;                  %area of all of the fins, meters^2
-A_nofins = L_SIDE * L_DUCT * 4;      %area with fins removed, meters^2
-A_unfin = A_nofins - N * A_b;        %area of fin bank with no fins, meters^2
-A_tot = A_fins + A_unfin;            %total area of fin bank, meters^2
-%eta_tot = 1 - ((A_fins) / (A_tot)) * (1 - eta_fin); %unused total efficiency
+n = 1
+x = 16:1:1000
+for k_duct = x
+    y(n) = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    n = n + 1;
+end
+plot(x,y)
 
-%% Calculate Fin Convection Resistance
-%R_tot = 1 / (h * A_tot * eta_tot) 
-R_fins = 1 / (h * A_fins * eta_fin); %fins convection thermal resistance, K/W
-R_unfin = 1 / (h * A_unfin);         %unfin convection thermal resistance, K/W
-R_tot = 1/(1/R_fins+1/R_unfin);      %total resistance - parallel resistors, K/W
-
-%% a) Determine Maximum allowable power dissipation per transistor
-Q_dot_tot = (T_b-T_inf)/R_tot;       %heat transfer rate, W
-Q_dot_tran = Q_dot_tot/N_CPU         %allowed power per transistor
-
-%% Simulate
-
-% calculate mass flow rate from fan flow rate and air density at input
-% temperature...
+clear
+%% Load and Define Constants
+constants
+constants_part3
+[N, P_CPU] = meshgrid(1:250, 10:190);
+P_CPUs = P_CPU*36;
+CPU_perf = 39000*(1-exp(-.02*P_CPU));    %CPU Performance Score
+performance = zeros(size(CPU_perf));
+for i = 1:size(CPU_perf, 1)
+    for j = 1:size(CPU_perf, 2)
+        performance(i,j) = perf(CPU_perf(i,j), P_CPUs(i,j), h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N(i,j), t, L, L_SIDE, L_DUCT, w, rho, nu, Pr);
+    end
+end
+surf(N, P_CPU, performance)
