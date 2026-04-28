@@ -799,49 +799,6 @@ Q_dot_tran = Q_dot_tot/N_CPU         %allowed power per transistor
 m_dot_air = Q_dot_tot/(c_p*dT_air)   %minimum volume flow rate, kg/s
 \end{verbatim}
 \noindent
-\(
-\textbf{Fin Efficiencies}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$m = \sqrt{\frac{2h}{kt}}$ & Constant for calculating efficiency \\
-$L_c = L + \frac{t}{2}$ & Corrected fin length (meters) \\
-$\eta_{fin} = \frac{\text{tanh}(mL_c)}{mL_c}$ & Single fin efficiency \\
-\end{tabular*}\\
-\\
-\\
-\textbf{Areas}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$A_b = wt$ & Area of single fin base, m$^2$ \\
-$A_{fin} = 2wL_c$ & Area of single fin, m$^2$ \\
-$A_{fins} = NA_{fin}$ & Area of all fins, m$^2$ \\
-$A_{no fins} = 4L_{side}L_{duct}$ & Area with fins removed, m$^2$\\
-$A_{unfin} = A_{nofins} - NA_b$ & Area of fin bank with no fins, m$^2$\\
-$A_{tot} = A_{fins} + A_{unfin}$ & Total area of fin bank, m$^2$\\
-\end{tabular*}\\
-\\
-\\
-\textbf{Fin Convection Resistance}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$R_{fins} = \frac{1}{hA_{fins}\eta_{fin}}$ &Fins convection thermal resistance, K/W \\
-$R_{unfin} = \frac{1}{hA_{unfin}}$ & Unfin convection thermal resistance, K/W \\
-$R_{tot} = \frac{1}{\frac{1}{R_{fins}} + \frac{1}{R_{unfin}}}$ & Total resistance (parallel resistors), K/W \\
-\end{tabular*}\\
-\\
-\\
-\textbf{(a) Determine Maximum Allowable Power Dissipation Per CPU}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$\dot{Q}_{tot} = \frac{T_b - T_\infty}{R_{tot}}$ & Heat transfer rate, W \\
-$\dot{Q}_{tran} = \frac{\dot{Q}_{tot}}{N_{CPU}}$ & Allowed power per CPU \\
-\end{tabular*}\\
-\\
-\\
-\textbf{(b) Determine Required Volume Flow Rate of Air}\\
-\\
-\dot{m}_{air} = \frac{\dot{Q}_{tot}}{c_p\Delta T_{air}}
-\)
 \subsubsection{part2.m}
 \begin{verbatim}
 clear
@@ -873,49 +830,6 @@ Q_fan = (m_dot_air / rho) * 60 * 1000; %In L/min
 P_fan = ((Q_fan/100000)^3)*10000
 \end{verbatim}	
 \noindent
-\(
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$P_{CPU} = 1000$ & CPU Power, W \\
-$P_{fan} = 1000$ & Fan Power, W \\
-$P_{tot} = P_{CPU} + P_{fan}$ & Total Power \\
-$CPU_{perf} = 39000(1 - e^{-0.02P_{CPU}})$ & CPU Performance Score \\
-$Q_{fan} = \frac{100000(\frac{P_{fan}}{10000})^{1/3}}{1000*60}$ & Fan Flow Rate, m$^3$ \\
-\end{tabular*}\\
-\\
-\\
-\textbf{Thermal Resistances}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$R_{paste} = \frac{1}{h_cA_{c\ CPUs}}$ & Thermal Paste Resitance \\
-$R_{cond} = \frac{t_{Duct}}{kA_{c\ wall}}$ & Conductor Resistance \\
-\end{tabular*}\\
-\\
-\\
-\textbf{Mass Flow Rate}\\
-\\
-\dot{m}_{air} = Q_{fan}\rho\\
-\\
-\textbf{Mean Velocity}\\
-\\
-u_m = \frac{\dot{m}_{air}}{\rho A_c}\\
-\\
-\textbf{Surrogate Duct Reynolds Number}\\
-\\
-Re_D = \frac{u_m D_h}{\nu}\\
-\\
-\textbf{Convection Heat Transfer Coefficient}\\
-\\
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$Nu = 0.023Re_D^{0.8}Pr^{0.4}$ & Nusselt Number \\
-$h = \frac{Nu*k}{D_h}$ & Convection heat transfer coefficient (W/(m$^2$*k) \\
-\end{tabular*}\\
-\\
-\\
-\textbf{Surface Temperatures}\\
-\\
-T_{\infty} = T_{bulk}\\
-T_b = \frac{90R_{tot} + T_{\infty}(R_{paste} + R_{cond})}{R_{tot} + R_{paste} + R_{cond}}\\
-\)
 \subsubsection{part3.m}
 \begin{verbatim}
 clear
@@ -1169,18 +1083,6 @@ L_SIDE = 0.15;                       %Duct side len, meters
 L_DUCT = 0.15;                       %Duct len, meters
 w = L_DUCT;                          %fin width, meters
 \end{verbatim}
-\noindent
-\(
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$N = 24*4$ & Total number of fins \\
-$N_{CPU} = 9*4$ & Total number of CPUs \\
-$t = 0.002$ & Fin thickness, meters \\
-$L = 0.025$ & Fin length, meters \\
-$L_{side} = 0.15$ & Duct side length, meters \\
-$L_{duct} = 0.15$ & Duct length, meters \\
-$w = L_{duct}$ & Fin width, meters \\
-\end{tabular*}
-\)
 \subsubsection{constants\_part1.m}
 \begin{verbatim}
 h = 50; %convection heat transfer coefficient, W/(m^2*K)
@@ -1192,17 +1094,6 @@ rho = 1.14;                          %air density, kg/m^3
 dT_air = 10;                         %maximum change in air temp, K
 \end{verbatim}
 \noindent
-\(
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$h = 50$ & Convection heat transfer coefficient, W/(m$^2$*k) \\
-$k = 178$ & Thermal conductivity, W/(m*k) \\
-$T_\infty = 310$ & Average air temp through box passageway, K \\
-$T_b = 360$ & Maximum transistor temperature at base \\
-$c_p = 1006$ & c$_p$ for air, J/(kg*K) \\
-$\rho = 1.14$ & Air density, kg/m$^3$ \\
-$\Delta T_{air} = 10$ & Maximum change in air temp, K \\
-\end{tabular*}
-\)
 \subsubsection{constants\_part2.m}
 \begin{verbatim}
 t_DUCT = 0.01;                       %Duct thickness, meters
@@ -1228,21 +1119,6 @@ Pr = 0.7268;
 
 \end{verbatim}
 \noindent
-\(
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
-$t_{duct} = 0.01$ & Duct thickness, meters \\
-$s = \frac{L_{side} - L - \frac{N}{4}t}{\frac{N}{4} + 1}$ & Spacing between fins, meters \\
-$A_c = L_{side}^2 - LtN$ & Cross sectional area, meters$^2$ \\
-$D_h = \frac{2Ls}{L + s}$ & Hydraulic diameter of surrogate duct, meters \\
-$T_{mi} = 20 + 273.15$ & Mean inlet temperature, K \\
-$T_{me} = 50 + 273.15$ & Maximum mean duct exit temperature, K\\
-$c_p = 1007$ & Specific heat of air between 15 and 70 deg C, J/(k*K) FROM TABLE \\
-$k = 383$ & Thermal conductivity \\
-$A_{c\ CPUs} = 0.0014*9$ & Total cross sectional area of CPUs for contact resistance, m$^2$ \\
-$h_c = 6$ & Thermal paste thermal contact coefficient, W/(m$^2$*K) \\
-\end{tabular*}
-\)
-
 \subsubsection{constants\_part3.m}
 \begin{verbatim}
 t_DUCT = 0.01;                       %Duct thickness, meters
