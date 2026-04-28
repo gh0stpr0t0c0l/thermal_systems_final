@@ -163,7 +163,7 @@ Our simplifying assumptions can be seen below:
 
 \item Assume turbulent airflow. This is to simplify several calculations, and is what we would expect from this type of duct and fin bank.
 
-\item Assume thin fins, no heat transfer out of the sides of the fins, and 1D heat transfer. This is a common fin bank analysis technique.
+\item Assume thin fins, no heat transfer out of the sides of the fins, and 1D heat transfer. This is a common fin bank analysis technique, and allows us to use tabulated data for fin efficiency calculations.
 
 \item Assume changes in kinetic and potential energy are negligible. This is necessary to simplify the First Law of Thermodynamics, and is a reasonable assumption for the convection through the fins since there is not a large change in either. %%FIXME
 \end{enumerate}
@@ -546,6 +546,9 @@ The fin(s) \textit{shall} extend the entire length of the duct. & Our design use
 \end{table}
 
 \section{Results}
+
+Note that some of the plots below include points that extend beyond performance requirements. See the data tables for each plot in the appendix for the usable range per the project requirements.
+
 \subsection{Variation of Material (Conductivity)}
 
 \begin{figure}[H]
@@ -554,7 +557,7 @@ The fin(s) \textit{shall} extend the entire length of the duct. & Our design use
     \caption{Performance vs. Duct Material}
 \end{figure}
 
-The above graph illustrates a significant performance improvement moving from a poor material choice (such as steel with a low k-coefficient) to better materials (such as copper or better materials). The increase from a poor material to a better material grants significant gains, but once the material is already a good choice, the increase from that good material to a better material means that the fin efficiency is already near-ideal, so there is minimal further benefit.
+The above graph illustrates a significant performance improvement moving from a poor material choice (such as steel with a low k-coefficient) to better materials (such as copper). The increase from a very poor material to a better material grants significant gains, but there are diminishing returns past a thermal conductivity of around 150 $\frac{W}{m\cdot K}$.
 
 \subsection{Variation of Fin Count}
 
@@ -564,7 +567,7 @@ The above graph illustrates a significant performance improvement moving from a 
     \caption{Performance vs. Fin Count}
 \end{figure}
 
-It can be observed that there is a strong increase in performance when initially increasing the fin count N, as is reasonably expected because more fins corresponds to more surface area and thus better cooling; however, an increase in fin count also implies less spacing between fins, smaller hydraulic diameter $D_h$ and higher flow resistance. Because of these drawbacks, the benefits gained from better cooling are eventually canceled out by the practical penalty implied by a finite area; therefore, the curve eventually flattening out is expected. For design, the optimal region—similarly to that of the prior performance versus fin length relationship—is that at which the curve flattens at around the 50 fan point.
+It can be observed that there is a strong increase in performance when initially increasing the fin count N. This is reasonable to expect because more fins corresponds to more surface area and thus better cooling. However, an increase in fin count also implies less spacing between fins, smaller hydraulic diameter $D_h$ and higher flow resistance. Because of these drawbacks, the benefits gained from better cooling are eventually canceled out by the practical penalty implied by a finite area. Therefore, the curve eventually flattening out is expected. For design, the optimal region---similar to that of the performance-versus-fin-length relationship below---is that at which the curve flattens at around the 50 fin point. If manufacturing cost increases with the number of fins, it would be reasonable to stop in this range.
 
 \subsection{Variation of Fin Thickness}
 
@@ -574,7 +577,7 @@ It can be observed that there is a strong increase in performance when initially
     \caption{Performance vs. Fin Thickness}
 \end{figure}
 
-The graph of performance versus fin thickness demonstrates a clear relationship in which there is a very sharp increase in performance once the fins are not incredibly thin, as is intuitive because improving the conduction correlates with a higher fin efficiency. Following this increase, however, is a clear, flat plateau in which increasing fin thickness provides no further benefit. This makes sense because reducing the spacing between fins significantly decreases airflow, thereby canceling out the benefit offered by increased conduction. Thus, the optimal region for design is at the point of diminishing returns, corresponding to a fin thickness of approximately 0.2 m.
+The graph of performance versus fin thickness demonstrates a clear relationship in which there is a very sharp increase in performance from very thin fins to moderately thin fins. Following this increase, however, is a clear, flat plateau in which increasing fin thickness provides no further benefit. This makes sense because reducing the spacing between fins significantly decreases airflow, thereby canceling out the benefit offered by increased conduction. Thus, the optimal region for design is at the point of diminishing returns, corresponding to a fin thickness of approximately 0.2 m.
 
 \subsection{Variation of Fin Length}
 
@@ -584,7 +587,7 @@ The graph of performance versus fin thickness demonstrates a clear relationship 
     \caption{Performance vs. Fin Length}
 \end{figure}
 
-As can be seen from the graph of performance versus fin length L, there is a rapid increase in performance at a small L, then followed by a clear plateau. This is intuitively reasonable because increasing L increases the effective surface area, thereby improving the heat transfer; however, fin efficiency drops along the length as temperature decays. The extra area added, therefore, becomes thermally inactive, leading to a lower fin efficiency. Thus, for design, the optimal region is that at which the curve flattens, at around the 0.02 m point.
+As can be seen from the graph above, adding fins initially decreases the performance (likely because they disrupt usable surface area in our model), but after that, there is a clear performance advantage to longer fins. Like the other metrics, this variable also plateaus, indicating a point of diminishing returns around $0.02\ m$.
 
 \subsection{Variation of CPU Power and Number of Fins}
 
@@ -594,19 +597,23 @@ As can be seen from the graph of performance versus fin length L, there is a rap
     \caption{Performance vs. Single $P_{PCU}$ and Total Number of Fins}
 \end{figure}
 
-The above surface plot illustrates the relationship between system performance, CPU power, and fin count. Increasing the number of fins generally improves performance due to the added heat transfer area, while increasing CPU power initially increases performance due to higher computational output. However, at higher power levels, the required cooling becomes more demanding, and the fan power increases rapidly due to its nonlinear dependence on airflow. As a result, performance gains begin to diminish, especially at high CPU power and high fin counts, where the cooling system becomes the limiting factor. This demonstrates that while both increasing fin count and CPU power can improve performance, their combined effects are constrained by the efficiency and power requirements of the cooling system. 
+The above surface plot illustrates the relationship between system performance, CPU power, and fin count. Increasing the number of fins generally improves performance due to the added heat transfer area, while increasing CPU power generally decreases performance of the fin bank. This demonstrates that while the 2-dimensional plots above show ways to improve single metrics, this multivariable system can have local minima and maxima caused by variable interaction. Thus choosing the optimal solution is a very complicated problem. 
 
 \subsection{Evaluation of Assumptions From Part 1 and 2 Based on Results}
 
-Looking back at our assumptions, most were either correct or incredibly useful in simplifying our calculations. For example, the typical fin bank assumptions (1-D heat transfer, thin fins, steady state, etc.) reduced a great deal of work in this project. Additionally, assumptions such as perfectly caloric air, conservation of mass, and negligible changes in kinetic and potential energy allowed us to perform calculations that would otherwise be either very difficult or unsolvable.
+Looking back at our assumptions, most were either correct (for instance, scientific laws) or incredibly useful in simplifying our calculations (like 1-dimensional heat transfer). For example, the typical fin bank assumptions (1-D heat transfer, thin fins, steady state, etc.) reduced a great deal of work in this project. Additionally, assumptions such as perfectly caloric air, conservation of mass, and negligible changes in kinetic and potential energy allowed us to perform calculations that would otherwise be either very difficult or unsolvable with what we have learned in this class.
 
-However, not all of our assumptions were correct. Specifically, we assumed that the airflow would be turbulent, as this would be expected from this type of duct and fin bank. During our Part 1 calculations, however, we found that the Reynold's number for our design was 1,878.5. While this isn't too far off from the requirement for turbulent airflow (roughly 2,300), it is still low enough to be classified as laminar flow, which is not what we expected. That said, it is entirely possible that the fan will introduce enough force to make the flow turbulent. 
+However, not all of our assumptions were correct. Specifically, we assumed that the airflow would be turbulent, as this would be expected from this type of duct and fin bank. During our Part 1 calculations, however, we found that the Reynold's number for our design was 1,878.5. While this isn't too far off from the requirement for turbulent airflow (roughly 4,000), it is still low enough to be classified as laminar flow, which is not what we expected. That said, since we would expect the motion of the fan to introduce turbulent flow, it is likely still a good assumption.
+
+Also of note is our assumption of $T_{bulk}$. As described above, with our solution method we were able to compare our calculation with our assumed value and choose an assumption that matched our results.
 
 \section{Conclusions}
 
 After analyzing our results, we can conclude that while there are numerous variables that affect the overall performance of the duct system, a few in particular affect the performance more than others. Fin count and fin length specifically seem to have a greater variation of performance based on their value, especially when compared to duct material and fin thickness. This makes sense, as fin count and length affect the fin surface area significantly more then fin thickness and duct material. The surface area than drastically changes how much heat is able to be transferred.
 
-Additionally, we noted that regardless of how you change the variables, there is an ultimate ceiling the overall performance can reach. Notice that in the plots for each variable, each one maxes out around 11.36. This tells us that although you can absolutely get worse performance by changing variables, you can only make the performance so good until you reach diminishing returns. 
+Additionally, we noted that regardless of how you change the variables, there appears to be a natural ceiling to what the overall performance can reach. Notice that in the plots for each variable, each one maxes out around 11.36. This tells us that although you can easily get worse performance by changing variables, you can only improve the performance so much until you reach diminishing returns. 
+
+Finally, throughout this project, we have all learned about making assumptions. When problems are large, it is often possible to break them down into more reasonable pieces. This can be done by making simplifying assumptions. However, once the process is finished, results must be compared to reality to see if the assumptions you made along the way are reasonable.
 
 \newpage
 \section{Appendices}
