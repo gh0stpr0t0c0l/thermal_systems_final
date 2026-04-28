@@ -103,13 +103,25 @@ However, we decided to break the algebraic loop at a slightly different point so
 
 To accomplish this change, we decided to solve both sides for $T_{bulk}$, the free-stream average temperature in the duct. Note that in Part 1, $T_{\infty} = T_{bulk}$. Setting the bulk temperature for each half equal allows us to set $\dot{Q}_{CPU}$ and solve for the desired variables. This procedure is outlined in more detail in the Calculations section below.
 
-We built a simple iterative solver in MATLAB which performs a search incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reduction of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
+We built a simple iterative solver in MATLAB which performs a search incrementally adjusting $h$ until the sign of $f(h)$ changes, followed by successive reductions of the step size to refine the solution. This process continues until the difference between the two temperature estimates falls below a prescribed tolerance.
 
-At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, allowing for complete definition of the system
+At each iteration, the Reynolds number, velocity, mass flow rate, and temperatures are updated, allowing for a complete description of the system and plotting parameters.
 
 \subsubsection{Surrogate Duct and Flow Assumptions}
 
-To make these calculations possible, the flow between fins is modeled as a series of identical rectangular ducts (referred to as surrogate ducts), formed by the spaces between adjacent fins. This simplifies the Reynolds number calculation since these spaces are rectangular. This is a reasonable assumption because most of the convective heat transfer occurs within these spaces. The flow is also assumed to be Turbulent and fully developed, since this also greatly simplifies the calculation. These assumptions will be evaluated in a later section.
+To make these calculations possible, the flow between fins is modeled as a series of identical rectangular ducts (referred to as surrogate ducts), formed by the spaces between adjacent fins. This simplifies the Reynolds number calculation since these spaces are rectangular. This is a reasonable assumption because most of the convective heat transfer occurs within these spaces. The flow is also assumed to be turbulent and fully developed, since this also greatly simplifies the calculation. These assumptions will be evaluated in a later section.
+
+Additionally, before calculations could start, air properties had to be determined. To do so, we assumed a $T_{bulk}$ of $35^\circ C$, which is the average of the inlet temperature $T_{m,i}$ and the maximum exit temperature $T_{m,e}$. This was done to select $\rho$ (density, $\tfrac{kg}{m^3}$), $c_p$ (specific heat $\tfrac{J}{kg \cdot K}$), $k$ (thermal conductivity, $\tfrac{W}{m\cdot K})$, $\nu$ (kinematic viscosity, $\tfrac{m^2}{s}$), and $Pr$ (Prandtl number). However, after simulation, our $T_{m,e}$ values were much closer to $30^\circ C$ (see tables in appendix), so our initial assumptions were modified to fit this result.
+
+\subsubsection{Conduction Considerations}
+
+This part of the problem also included the addition of thermal conduction through a thermal paste layer and the walls of the duct. This is reflected in the thermal resistance diagram in the calculations section below. For the thermal paste, we selected ``\href{https://www.tomshardware.com/best-picks/best-thermal-paste}{ID-Cooling Frost X45}'', which advertises a thermal conductivity of 15.2 $\tfrac{W}{m\cdot K}$. We know that 
+
+$$h_c = \frac{k}{t}$$
+
+so an application of this paste with a thickness of $t \approx 0.5 mm$ results in a thermal contact coefficient of $30,000\ \tfrac{W}{m^2\cdot K}$. This is on the thicker end of applications, but trying with different thicknesses did not vary results much under a certain threshold.
+
+Additionally, thermal resistance from conduction was included in the calculation. We decided to use copper for our duct due to its high thermal conductivity. Varying this parameter in Part 3 confirms this decision.
 
 \subsection{Part 3 - Performance Analysis}
 \subsubsection{Introduction to Part 3}
@@ -118,28 +130,30 @@ The third and final part of this project sought to use the models developed in t
 
 \subsubsection{Performance Analysis and Parametric Study}
 
-In Part 3, the validated thermal–fluid model is used to evaluate system performance as a function of key fin bank design parameters. The objective is to maximize the performance metric defined as the ratio of computational performance to total power consumption.
+In Part 3, the constructed model is used to evaluate system performance as a function of key fin bank design parameters. The objective is to maximize the performance metric defined as the ratio of computational performance to total power consumption.
+
+This part of the MATLAB code is particularly complicated, but it is simply used to tabulate data using the method defined in Parts 1 and 2 for varying various parameters. Note that as each parameter is varied, the unrelated parameters are held constant. This data can be seen in the Calculation section plots and in the appendix tables. Additionally, the full code can be found in the appendix.
 
 \subsection{Assumptions}
 
-In order to properly complete this project, we had to make some assumptions along the way. The assumptions we made are as follows:
+Our simplifying assumptions can be seen below:
 \\
 \begin{quote}
-1. Assume all heat from CPUs is dissipated through the fin bank. This greatly reduced the amount of work and considerations needed for later calculations. 
+1. Assume all heat from CPUs is dissipated through the fin bank (no heat loss to the external environment). This greatly reduced the amount of work and considerations needed for later calculations. 
 
-2. Assume 1-D heat transfer through the entire system (perpendicular to the duct wall and perpendicular . This is a typical assumption for fin bank analysis. 
+2. Assume 1-D heat transfer for the conduction and convection sections (perpendicular to the duct wall and perpendicular. This is a typical assumption for fin bank analysis. 
 
 3. Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
 
-4. Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces work by preventing extra conduction between touching fins.
+4. Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces prevents odd behavior between touching fins and keeps the surrogate ducts identical.
 
-5. Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply multiply by the number of fins.
+5. Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply scale by the number of fins.
 
 6. Assume perfectly caloric air. This helps us in our calculations of the volume flow rate of the air.
 
 7. Assume conservation of mass. This allows us to calculate the mean velocity of the air.
 
-8. Assume $T_{bulk} = 30^\circ C$. This allows us to compute many calculations that would be unsolvable otherwise, as well as determine certain values from a properties table. EXPLAIN IN FURTHER DETAIL ELSEWHERE 
+8. Assume $T_{bulk} = 30^\circ C$. This allows us to compute many calculations that would be unsolvable otherwise, as well as determine certain values from a properties table. Why we chose this value is explained above. 
 
 9. Assume turbulent airflow. This is to simplify several calculations, and is what we would expect from this type of duct and fin bank.
 \end{quote}
