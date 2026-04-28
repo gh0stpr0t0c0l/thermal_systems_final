@@ -52,7 +52,7 @@ In this Thermal Systems project, we set out to design a fin bank for a given duc
 \subsection{Part 1 - Fin Bank}
 \subsubsection{Introduction to Part 1}
 
-The first part of this project focused on developing the model used to describe convective heat transfer within the fin bank. While there were many ways to model the system (dedicated iterative solver software, Python, etc.) we chose to use MATLAB because of its familiarity and ease setup among teammates with the required software. 
+The first part of this project focused on developing the model used to describe convective heat transfer within the fin bank. While there were many ways to model the system (dedicated iterative solver software, Python, etc.) we chose to use MATLAB because of its familiarity and ease of setup among teammates with the required software. 
 
 Part 1 was the most straightforward of the project, simply consisting of calculating various parameters required for describing the fin bank. This included fin efficiencies, fin bank areas, and thermal resistances. After creating this model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in the appendix. %%FIXME
 
@@ -149,7 +149,7 @@ Our simplifying assumptions can be seen below:
 
 \item Assume 1-D heat transfer for the conduction and convection sections (perpendicular to the duct wall and perpendicular to the fins). This is a typical assumption for fin bank analysis. 
 
-\item Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
+\item Assume steady state conduction and fin convection. These are typical assumptions for fin bank analysis.
 
 \item Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This prevents odd behavior between touching fins and keeps the surrogate ducts identical.
 
@@ -609,7 +609,7 @@ Also of note is our assumption of $T_{bulk}$. As described above, with our solut
 
 \section{Conclusions}
 
-After analyzing our results, we can conclude that while there are numerous variables that affect the overall performance of the duct system, a few in particular affect the performance more than others. Fin count and fin length specifically seem to have a greater variation of performance based on their value, especially when compared to duct material and fin thickness. This makes sense, as fin count and length affect the fin surface area significantly more then fin thickness and duct material. The surface area than drastically changes how much heat is able to be transferred.
+After analyzing our results, we can conclude that while there are numerous variables that affect the overall performance of the duct system, a few in particular affect the performance more than others. Fin count and fin length specifically seem to have a greater variation of performance based on their value, especially when compared to duct material and fin thickness. This makes sense, as fin count and length affect the fin surface area significantly more than fin thickness and duct material. The surface area than drastically changes how much heat is able to be transferred.
 
 Additionally, we noted that regardless of how you change the variables, there appears to be a natural ceiling to what the overall performance can reach. Notice that in the plots for each variable, each one maxes out around 11.36. This tells us that although you can easily get worse performance by changing variables, you can only improve the performance so much until you reach diminishing returns. 
 
