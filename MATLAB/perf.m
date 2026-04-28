@@ -1,4 +1,4 @@
-function perf_out = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
+function [perf_out, P_fan, Re_D, T_me] = perf(CPU_perf, P_CPUs, h_c, t_DUCT, T_mi, c_p, k_air, k_duct, A_c_walls, A_c_CPUs, N, t, L, L_SIDE, L_DUCT, w, rho, nu, Pr)
     s = (L_SIDE-L-N/4*t)/(N/4+1);        %Spacing between fins, meters
     A_c = L_SIDE^2 - L*t*N;              %Cross sectional area, meters^2
     D_h = (2*L*s)/(L+s);                 %Hydraulic diameter of surragate duct, meters
