@@ -17,7 +17,7 @@
 %\setlength{\textwidth}{6.0in}
 %\setlength{\textheight}{9.0in}
 %\renewcommand{\baselinestretch}{1.4}
-%\usepackage{indentfirst} %Maybe keep this maybe not
+\usepackage{indentfirst} %Maybe keep this maybe not
 
 \begin{document}
 \maketitle
@@ -39,7 +39,51 @@ Abstract here - we need contributions from each member somewhere
 \newpage
 \section{Introduction}
 
+In this Thermal Systems project, we set out to design a fin bank for a given duct,  create a model describing the system as a whole, and analyze how changing different variables within the model affects the system. The geometry of the duct itself was given to us, and a simplified version of the geometry can be found in Figure XXX in the appendix. To simplify the task, this project was split into three parts, described below.
+
+\subsection{Part 1 - Fin Bank}
+
+The first part of this project focused on developing the model used to describe the fin bank. While there were many ways to model the system (iterative solver software, Python, etc.) we chose to use MATLAB because of it's familiarity and ease of use with GitHub for sharing among teammates. This part was the most straightforward of the project, simply consisting of calculating various parameters required for describing a fin bank. This included fin efficiencies, fin bank areas, and different resistances. After creating our model, we verified it by using it to solve Example 2.11(a) from Slide 79 of the Thermal Conduction notes, previously solved in class by Dr. Miller. This script, along with all other MATLAB scripts used throughout the project, can be found in Figures XXX-XXX in the appendix.
+
+\subsection{Part 2 - Cooling System}
+
+The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. This diagram can be found in Figure XXX in the appendix. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
+
+FINISH
+
+\subsection{Part 3 - Performance Analysis}
+
+The third and final part of this project sought to use the models developed in the first two parts and evaluate their performances as a function of various design parameters for the fin bank (number of fins, fin thickness, fin length, etc.). The problem statement provided a defined fin bank geometry, which we were able to use to analyze the model's performance.  Additionally, the performance was computed used a given benchmark CPU performance score given by the problem statement.
+
+FINISH
+
 \section{Assumptions}
+
+In order to properly complete this project, we had to make some assumptions along the way. The assumptions we made are as follows:
+\\
+
+\begin{quote}
+1. Assume all heat from CPUs is dissipated through the fin bank. This greatly reduced the amount of work and considerations needed for later calculations. 
+
+2. Assume 1-D heat transfer through the entire system (perpendicular to the duct wall and perpendicular . This is a typical assumption for fin bank analysis. 
+
+3. Assume steady state conduction and fin convention. These are typical assumptions for fin bank analysis.
+
+4. Assume that, for a given side, there is a space between the first fin and the wall, and a space between the last fin and the first fin on the adjacent sides. This reduces work by preventing extra conduction between touching fins.
+
+5. Assume each fin has an identical profile. This reduces work by allowing us to calculate the heat transfer through one fin and simply multiply by the number of fins.
+
+6. 
+\end{quote}
+
+
+\\
+\\
+\\
+\(
+T_{bulk}
+\)
+
 \section{Calculations}
 \section{Results}
 \section{Conclusions}
@@ -47,82 +91,71 @@ Abstract here - we need contributions from each member somewhere
 \section{Appendices}
 
 \subsection{part1.m}
+\noindent
 \(
 \textbf{Fin Efficiencies}\\
 \\
-m = \sqrt{\frac{2h}{kt}}
-\text{\quad - Constant for calculating efficiency}\\
-\\
-L_c = L + \frac{t}{2}
-\text{\quad - Corrected fin length (meters)}\\
-\\
-\eta_{fin} = \frac{\text{tanh}(mL_c)}{mL_c}
-\text{\quad - Single fin efficiency}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$m = \sqrt{\frac{2h}{kt}}$ & Constant for calculating efficiency \\
+$L_c = L + \frac{t}{2}$ & Corrected fin length (meters) \\
+$\eta_{fin} = \frac{\text{tanh}(mL_c)}{mL_c}$ & Single fin efficiency \\
+\end{tabular*}\\
 \\
 \\
 \textbf{Areas}\\
 \\
-A_b = wt
-\text{\quad - Area of single fin base, m$^2$}\\
-\\
-A_{fin} = 2wL_c
-\text{\quad - Area of single fin, m$^2$}\\
-\\
-A_{fins} = NA_{fin}
-\text{\quad - Area of all fins, m$^2$}\\
-\\
-A_{no fins} = 4L_{side}L_{duct}
-\text{\quad - Area with fins removed, m$^2$}\\
-\\
-A_{unfin} = A_{nofins} - NA_b
-\text{\quad - Area of fin bank with no fins, m$^2$}\\
-\\
-A_{tot} = A_{fins} + A_{unfin}
-\text{\quad - Total area of fin bank, m$^2$}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$A_b = wt$ & Area of single fin base, m$^2$ \\
+$A_{fin} = 2wL_c$ & Area of single fin, m$^2$ \\
+$A_{fins} = NA_{fin}$ & Area of all fins, m$^2$ \\
+$A_{no fins} = 4L_{side}L_{duct}$ & Area with fins removed, m$^2$\\
+$A_{unfin} = A_{nofins} - NA_b$ & Area of fin bank with no fins, m$^2$\\
+$A_{tot} = A_{fins} + A_{unfin}$ & Total area of fin bank, m$^2$\\
+\end{tabular*}\\
 \\
 \\
 \textbf{Fin Convection Resistance}\\
 \\
-R_{fins} = \frac{1}{hA_{fins}\eta_{fin}}
-\text{\quad - Fins convection thermal resistance, K/W}\\
-\\
-R_{unfin} = \frac{1}{hA_{unfin}}
-\text{\quad - Unfin convection thermal resistance, K/W}\\
-\\
-R_{tot} = \frac{1}{\frac{1}{R_{fins}} + \frac{1}{R_{unfin}}}
-\text{\quad - Total resistance (parallel resistors), K/W}\\
-\\
-\textbf{(a) Determine Maximum allowable power dissipation per CPU}\\
-\\
-\dot{Q}_{tot} = \frac{T_b - T_\infty}{R_{tot}}
-\text{\quad - Heat transfer rate, W}\\
-\\
-\dot{Q}_{tran} = \frac{\dot{Q}_{tot}}{N_{CPU}}
-\text{\quad - Allowed power per CPU}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$R_{fins} = \frac{1}{hA_{fins}\eta_{fin}}$ &Fins convection thermal resistance, K/W \\
+$R_{unfin} = \frac{1}{hA_{unfin}}$ & Unfin convection thermal resistance, K/W \\
+$R_{tot} = \frac{1}{\frac{1}{R_{fins}} + \frac{1}{R_{unfin}}}$ & Total resistance (parallel resistors), K/W \\
+\end{tabular*}\\
 \\
 \\
-\textbf{(b) Determine required volume flow rate of air}\\
+\textbf{(a) Determine Maximum Allowable Power Dissipation Per CPU}\\
+\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$\dot{Q}_{tot} = \frac{T_b - T_\infty}{R_{tot}}$ & Heat transfer rate, W \\
+$\dot{Q}_{tran} = \frac{\dot{Q}_{tot}}{N_{CPU}}$ & Allowed power per CPU \\
+\end{tabular*}\\
+\\
+\\
+\textbf{(b) Determine Required Volume Flow Rate of Air}\\
 \\
 \text{Assume perfectly caloric}\\
 \\
 \dot{m}_{air} = \frac{\dot{Q}_{tot}}{c_p\Delta T_{air}}
 \)
 \subsection{part2.m}
+\noindent
 \(
-P_{CPU} = 1000 \text{\quad - CPU Power, W}\\
-P_{fan} = 1000 \text{\quad - Fan Power, W}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$P_{CPU} = 1000$ & CPU Power, W \\
+$P_{fan} = 1000$ & Fan Power, W \\
+$P_{tot} = P_{CPU} + P_{fan}$ & Total Power \\
+$CPU_{perf} = 39000(1 - e^{-0.02P_{CPU}})$ & CPU Performance Score \\
+$Q_{fan} = \frac{100000(\frac{P_{fan}}{10000})^{1/3}}{1000*60}$ & Fan Flow Rate, m$^3$ \\
+\end{tabular*}\\
 \\
-P_{tot} = P_{CPU} + P_{fan}\\
-\\
-CPU_{perf} = 39000(1 - e^{-0.02P_{CPU}}) \text{\quad - CPU Performance Score}\\
-\\
-Q_{fan} = \frac{100000(\frac{P_{fan}}{10000})^{1/3}}{1000*60} \text{\quad - Fan Flowrate, m$^3$/s}\\
 \\
 \textbf{Thermal Resistances}\\
 \\
-R_{paste} = \frac{1}{h_cA_{c\ CPUs}}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$R_{paste} = \frac{1}{h_cA_{c\ CPUs}}$ & Thermal Paste Resitance \\
+$R_{cond} = \frac{t_{Duct}}{kA_{c\ wall}}$ & Conductor Resistance \\
+\end{tabular*}\\
 \\
-R_{cond} = \frac{t_{Duct}}{kA_{c\ wall}}\\
 \\
 \textbf{Mass Flow Rate}\\
 \\
@@ -140,9 +173,11 @@ Re_D = \frac{u_m D_h}{\nu}\\
 \textbf{Convection Heat Transfer Coefficient}\\
 \\
 \text{Assume turbulent}\\
-Nu = 0.023Re_D^{0.8}Pr^{0.4}\\
-h = \frac{Nu*k}{D_h}
-\text{\quad - Convection heat transfer coefficient (W/(m$^2$*k)}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$Nu = 0.023Re_D^{0.8}Pr^{0.4}$ & Nusselt Number \\
+$h = \frac{Nu*k}{D_h}$ & Convection heat transfer coefficient (W/(m$^2$*k) \\
+\end{tabular*}\\
+\\
 \\
 \textbf{Surface Temperatures}\\
 \\
@@ -150,59 +185,53 @@ T_{\infty} = T_{bulk}\\
 T_b = \frac{90R_{tot} + T_{\infty}(R_{paste} + R_{cond})}{R_{tot} + R_{paste} + R_{cond}}\\
 \)
 \subsection{constants.m}
+\noindent
 \(
-N = 24*4 \text{\quad - Total number of fins}\\
-\\
-N_{CPU} = 9*4 \text{\quad - Total number of CPUs}\\
-\\
-t = 0.002 \text{\quad - Fin thickness, meters}\\
-\\
-L = 0.025 \text{\quad Fin length, meters}\\
-\\
-L_{side} = 0.15 \text{\quad Duct side length, meters}\\
-\\
-L_{duct} = 0.15 \text{\quad Duct length, meters}\\
-\\
-w = L_{duct} \text{\quad Fin width, meters}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$N = 24*4$ & Total number of fins \\
+$N_{CPU} = 9*4$ & Total number of CPUs \\
+$t = 0.002$ & Fin thickness, meters \\
+$L = 0.025$ & Fin length, meters \\
+$L_{side} = 0.15$ & Duct side length, meters \\
+$L_{duct} = 0.15$ & Duct length, meters \\
+$w = L_{duct}$ & Fin width, meters \\
+\end{tabular*}
 \)
 \subsection{constants\_part1.m}
+\noindent
 \(
-\\
-h = 50 \text{\quad Convection heat transfer coefficient, W/(m$^2$*k)}\\
-\\
-k = 178 \text{\quad - Thermal conductivity, W/(m*k)}\\
-\\
-T_\infty = 310 \text{\quad - Average air temp through box passageway, K}\\
-\\
-T_b = 360 \text{\quad - Maximum transistor temperature at base}\\
-\\
-c_p = 1006 \text{\quad - c$_p$ for air, J/(kg*K)}\\
-\\
-\rho = 1.14 \text{\quad - Air density, kg/m$^3$}\\
-\\
-\Delta T_{air} = 10 \text{\quad - Maximum change in air temp, K}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$h = 50$ & Convection heat transfer coefficient, W/(m$^2$*k) \\
+$k = 178$ & Thermal conductivity, W/(m*k) \\
+$T_\infty = 310$ & Average air temp through box passageway, K \\
+$T_b = 360$ & Maximum transistor temperature at base \\
+$c_p = 1006$ & c$_p$ for air, J/(kg*K) \\
+$\rho = 1.14$ & Air density, kg/m$^3$ \\
+$\Delta T_{air} = 10$ & Maximum change in air temp, K \\
+\end{tabular*}
 \)
 \subsection{constants\_part2\_3.m}
+\noindent
 \(
-\\
-t_{duct} = 0.01 \text{\quad - Duct thickness, meters}\\
-\\
-s = \frac{L_{side} - L - \frac{N}{4}t}{\frac{N}{4} + 1} \text{\quad - Spacing between fins, meters}\\
-\\
-A_c = L_{side}^2 - LtN \text{\quad - Cross sectional area, meters$^2$}\\
-\\
-D_h = \frac{2Ls}{L + s} \text{\quad - Hydraulic diameter of surrogate duct, meters}\\
-\\
-T_{mi} = 20 + 273.15 \text{\quad - Mean inlet temperature, K}\\
-\\
-T_{me} = 50 + 273.15 \text{\quad - Maximum mean duct exit temperature, K}\\
-\\
-c_p = 1007 \text{\quad - Specific heat of air between 15 and 70 deg C, J/(k*K) FROM TABLE}\\
-\\
-k = 383 \text{\quad - Thermal conductivity}\\
-\\
-A_{c\ CPUs} = 0.0014*9 \text{\quad - Total cross sectional area of CPUs for contact resistance, m$^2$}\\
-\\
-h_c = 6 \text{\quad - Thermal paste thermal contact coefficient, W/(m$^2$*K)}\\
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l r}
+$t_{duct} = 0.01$ & Duct thickness, meters \\
+$s = \frac{L_{side} - L - \frac{N}{4}t}{\frac{N}{4} + 1}$ & Spacing between fins, meters \\
+$A_c = L_{side}^2 - LtN$ & Cross sectional area, meters$^2$ \\
+$D_h = \frac{2Ls}{L + s}$ & Hydraulic diameter of surrogate duct, meters \\
+$T_{mi} = 20 + 273.15$ & Mean inlet temperature, K \\
+$T_{me} = 50 + 273.15$ & Maximum mean duct exit temperature, K\\
+$c_p = 1007$ & Specific heat of air between 15 and 70 deg C, J/(k*K) FROM TABLE \\
+$k = 383$ & Thermal conductivity \\
+$A_{c\ CPUs} = 0.0014*9$ & Total cross sectional area of CPUs for contact resistance, m$^2$ \\
+$h_c = 6$ & Thermal paste thermal contact coefficient, W/(m$^2$*K) \\
+\end{tabular*}
 \)
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Fin Bank Figure.PNG}
+    \caption{Enter Caption}
+    \label{fig:placeholder}
+\end{figure}
+
 \end{document}
