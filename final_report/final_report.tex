@@ -75,7 +75,7 @@ The modeling procedure follows a structured five-step process:
 \subsection{Part 2 - Cooling System}
 \subsubsection{Introduction to Part 2}
 
-The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. This diagram can be found in Figure XXX in the appendix. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
+The second part of this project focused on modifying our model to account for the cooling system, i.e. the air flow through the duct from a cooling fan. This included drawing a diagram of the "ducts" between each fin, which we treated as an enclosed duct. Additionally, this part of the project was the most computationally complex, as we needed to compute the hydraulic diameter and Reynolds number for the flow between fins, estimate the bulk temperature and mean air velocity in the duct, the convective heat transfer coefficient of the flow between fins, and the fan power required to cool the system.
 
 \subsubsection{Cooling Flow Model and Convective Heat Transfer}
 
@@ -508,7 +508,7 @@ The above graph illustrates a significant performance improvement moving from a 
     \caption{Performance vs. Fin Count}
 \end{figure}
 
-It can be observed that there is a strong increase in performance when initially increasing the fin count N, as is reasonably expected because more fins corresponds to more surface area and thus better cooling; however, an increase in fin count also implies less spacing between fins, smaller hydraulic diameter $D_h$ (XXX fix) and higher flow resistance. Because of these drawbacks, the benefits gained from better cooling are eventually canceled out by the practical penalty implied by a finite area; therefore, the curve eventually flattening out is expected. For design, the optimal region—similarly to that of the prior performance versus fin length relationship—is that at which the curve flattens at around the 50 fan point.
+It can be observed that there is a strong increase in performance when initially increasing the fin count N, as is reasonably expected because more fins corresponds to more surface area and thus better cooling; however, an increase in fin count also implies less spacing between fins, smaller hydraulic diameter $D_h$ and higher flow resistance. Because of these drawbacks, the benefits gained from better cooling are eventually canceled out by the practical penalty implied by a finite area; therefore, the curve eventually flattening out is expected. For design, the optimal region—similarly to that of the prior performance versus fin length relationship—is that at which the curve flattens at around the 50 fan point.
 
 \subsection{Variation of Fin Thickness}
 
